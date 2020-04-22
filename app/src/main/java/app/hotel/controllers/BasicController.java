@@ -179,7 +179,7 @@ public class BasicController {
         );
 
         guestSurname.setCellValueFactory(guestStringCellDataFeatures ->
-                new SimpleStringProperty(guestStringCellDataFeatures.getValue().getSurnamme())
+                new SimpleStringProperty(guestStringCellDataFeatures.getValue().getSurname())
         );
 
         guestPhonenumber.setCellValueFactory(guestStringCellDataFeatures ->
