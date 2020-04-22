@@ -1,0 +1,3 @@
+spring:
+  javafx:
+    title: "Hotel application"
