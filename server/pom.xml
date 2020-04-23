@@ -46,10 +46,10 @@
       <version>2.2.5.RELEASE</version>
     </dependency>
     <!--    Z tym dependency maven nie widzi testow-->
-    <!--    <dependency>-->
-    <!--      <groupId>org.springframework.boot</groupId>-->
-    <!--      <artifactId>spring-boot-starter-test</artifactId>-->
-    <!--    </dependency>-->
+<!--        <dependency>-->
+<!--          <groupId>org.springframework.boot</groupId>-->
+<!--          <artifactId>spring-boot-starter-test</artifactId>-->
+<!--        </dependency>-->
 
     <dependency>
       <groupId>org.projectlombok</groupId>
