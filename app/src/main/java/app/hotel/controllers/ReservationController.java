@@ -5,10 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -20,6 +17,8 @@ import java.util.ResourceBundle;
 @Controller
 public class ReservationController implements Initializable {
 
+    @FXML
+    private Label currencyValue;
 
     @FXML
     private TextField reservationId;
@@ -59,6 +58,7 @@ public class ReservationController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.possibleCurrency.setItems(InitCurrency());
         this.possibleCurrency.getSelectionModel().selectFirst();
+        this.currencyService.getCurrency();
     }
 
     public void addReservation() {
@@ -75,7 +75,7 @@ public class ReservationController implements Initializable {
         switchMainWindow();
     }
 
-    private ObservableList<String> InitCurrency(){
+    private ObservableList<String> InitCurrency() {
         ObservableList<String> observableList = FXCollections.observableArrayList();
         observableList.addAll(currencyService.getPossibleRates());
         return observableList;
@@ -83,13 +83,22 @@ public class ReservationController implements Initializable {
 
     public void payForReservation() {
         System.out.println("paid from user");
-        currencyService.getCurrency();
-     // printTextFields();
+        // printTextFields();
         switchMainWindow();
     }
 
-    public void rateValue(){
-        System.out.println(possibleCurrency.getValue());
+    public void rateValue() {
+        if (currencyService.getCurrencyRestModel() != null) {
+            System.out.println(possibleCurrency.getValue());
+
+            String convertedVal = String.valueOf(
+                    currencyService
+                    .getStrategyFactory()
+                    .findStrategy(possibleCurrency.getValue())
+                    .rateMoney(30, currencyService.getCurrencyRestModel().getRates()));     //TODO HARDCODED CASH
+
+            currencyValue.setText(convertedVal);
+        }
     }
 
     public void generateReport() {
