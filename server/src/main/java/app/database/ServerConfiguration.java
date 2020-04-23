@@ -1,10 +1,14 @@
 package app.database;
 
 
-import app.database.entities.RateModel;
+import app.database.api.StrategyFactory;
+import app.database.api.strategy.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Configuration
 public class ServerConfiguration {
@@ -15,5 +19,15 @@ public class ServerConfiguration {
     }
 
     @Bean
-    public RateModel rateModel() {return new RateModel();}
+    public StrategyFactory strategyFactory() {
+        Set<Exchange> exchanges = new HashSet<>();
+        exchanges.add(new USDExchange());
+        exchanges.add(new PLNExchange());
+        exchanges.add(new AUDExchange());
+        exchanges.add(new MXNExchange());
+        exchanges.add(new EURExchange());
+        exchanges.add(new CADExchange());
+
+        return new StrategyFactory(exchanges);
+    }
 }

@@ -15,18 +15,19 @@ public class CurrencyService {
 
     private static final String API_KEY = "5b34a02bed9a1306cfc730dcabc881ad";
     private final RestTemplate restTemplate;
-    private final RateModel rateModel;
+    private CurrencyRestModel currencyRestModel;
+    private final StrategyFactory strategyFactory;
 
     @Autowired
-    public CurrencyService(RestTemplate restTemplate, RateModel rateModel) {
+    public CurrencyService(RestTemplate restTemplate, StrategyFactory strategyFactory) {
         this.restTemplate = restTemplate;
-        this.rateModel = rateModel;
+        this.strategyFactory = strategyFactory;
     }
 
-    public CurrencyRestModel getCurrency() {
+    public void getCurrency() {
         final String uri = "http://data.fixer.io/api/latest?access_key=" + API_KEY + "&symbols=USD,AUD,CAD,PLN,MXN&format=1";
         ResponseEntity<CurrencyRestModel> result = restTemplate.getForEntity(uri, CurrencyRestModel.class);
-        return result.getBody();
+        currencyRestModel = result.getBody();
     }
 
     public ArrayList<String> getPossibleRates() {
@@ -36,27 +37,15 @@ public class CurrencyService {
         for(Field f : fields) {
             arrayList.add(f.getName());
         }
+        arrayList.add("EUR");
         return arrayList;
     }
 
-    public float rateOnePLNToEur(){
-        return 1 / rateModel.getPLN();
+    public StrategyFactory getStrategyFactory() {
+        return strategyFactory;
     }
 
-    public float ratePlnToUSD(Float costPln){
-        return costPln * rateModel.getUSD();
+    public CurrencyRestModel getCurrencyRestModel() {
+        return currencyRestModel;
     }
-
-    public float ratePlnToAUD(Float costPln){
-        return costPln * rateModel.getAUD();
-    }
-
-    public float ratePlnToCAD(Float costPln){
-        return costPln * rateModel.getCAD();
-    }
-
-    public float ratePlnToMXN(Float costPln){
-        return costPln * rateModel.getMXN();
-    }
-
 }
