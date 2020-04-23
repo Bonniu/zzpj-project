@@ -1,10 +1,28 @@
 package app.hotel.controllers;
 
+import app.database.api.CurrencyService;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
-public class ReservationController {
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
+@Controller
+public class ReservationController implements Initializable {
+
+
+    @FXML
+    private TextField reservationId;
 
     @FXML
     private TextField reservationGuestId;
@@ -27,6 +45,21 @@ public class ReservationController {
     @FXML
     private TextField reservationDateTo;
 
+    @FXML
+    private ChoiceBox<String> possibleCurrency;
+
+    private final CurrencyService currencyService;
+
+    @Autowired
+    public ReservationController(CurrencyService currencyService) {
+        this.currencyService = currencyService;
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        this.possibleCurrency.setItems(InitCurrency());
+        this.possibleCurrency.getSelectionModel().selectFirst();
+    }
 
     public void addReservation() {
         //TODO
@@ -40,6 +73,23 @@ public class ReservationController {
         System.out.println("reservation controller modify");
         printTextFields();
         switchMainWindow();
+    }
+
+    private ObservableList<String> InitCurrency(){
+        ObservableList<String> observableList = FXCollections.observableArrayList();
+        observableList.addAll(currencyService.getPossibleRates());
+        return observableList;
+    }
+
+    public void payForReservation() {
+        System.out.println("paid from user");
+        currencyService.getCurrency();
+     // printTextFields();
+        switchMainWindow();
+    }
+
+    public void rateValue(){
+        System.out.println(possibleCurrency.getValue());
     }
 
     public void generateReport() {
@@ -69,4 +119,6 @@ public class ReservationController {
     public void switchMainWindow() {
         AuxiliaryController.switchMainWindow();
     }
+
+
 }

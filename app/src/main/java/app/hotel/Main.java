@@ -16,7 +16,7 @@ import java.net.URL;
 
 public class Main extends Application {
 
-    private ConfigurableApplicationContext applicationContext;
+    private static ConfigurableApplicationContext applicationContext;
 
     public static Stage mainStage;
 
@@ -51,6 +51,7 @@ public class Main extends Application {
 
     public static void setScene(URL location, int width, int height) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(location);
+        fxmlLoader.setControllerFactory(AClass -> applicationContext.getBean(AClass));
         Parent parent = fxmlLoader.load();
         if (width == 0 || height == 0 || location.toString().contains("basic.fxml")) {
             mainStage.setScene(new Scene(parent, 920, 720));
@@ -58,4 +59,5 @@ public class Main extends Application {
             mainStage.setScene(new Scene(parent, width, height));
 
     }
+
 }
