@@ -2,7 +2,9 @@ package app.hotel.controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
+import org.springframework.stereotype.Controller;
 
+@Controller
 public class RoomController {
     @FXML
     private TextField roomNumber;

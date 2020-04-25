@@ -15,8 +15,8 @@ public class Reservation {
 
     @Id
     private String id;
-    private Guest guest;
-    private Room room;
+    private String guestId;
+    private String roomId;
     private Date startDate;
     private Date endDate;
     private float totalPrice;

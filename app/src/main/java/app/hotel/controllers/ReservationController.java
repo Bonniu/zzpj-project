@@ -1,11 +1,15 @@
 package app.hotel.controllers;
 
 import app.database.api.CurrencyService;
+import app.database.entities.Guest;
+import app.database.entities.Reservation;
+import app.hotel.dbcontroller.ReservationService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -14,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+@Getter
 @Controller
 public class ReservationController implements Initializable {
 
@@ -30,19 +35,19 @@ public class ReservationController implements Initializable {
     private TextField reservationRoomId;
 
     @FXML
-    private TextField reservationStartDate;
+    private DateCell reservationStartDate;
 
     @FXML
-    private TextField reservationEndDate;
+    private DateCell reservationEndDate;
 
     @FXML
     private TextField reservationTotalPrice;
 
     @FXML
-    private TextField reservationDateFrom;
+    private DateCell reservationDateFrom;
 
     @FXML
-    private TextField reservationDateTo;
+    private DateCell reservationDateTo;
 
     @FXML
     private ChoiceBox<String> possibleCurrency;
@@ -54,6 +59,7 @@ public class ReservationController implements Initializable {
         this.currencyService = currencyService;
     }
 
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.possibleCurrency.setItems(InitCurrency());
@@ -61,10 +67,16 @@ public class ReservationController implements Initializable {
         this.currencyService.getCurrency();
     }
 
+    @Autowired
+    private ReservationService reservationService;
+
     public void addReservation() {
-        //TODO
-        System.out.println("reservation controller add");
-        printTextFields();
+        Reservation reservation = new Reservation();
+        reservation.setRoomId(getReservationRoomId().getText());
+        reservation.setGuestId(getReservationGuestId().getText());
+        //reservation.setStartDate(getReservationStartDate());
+
+        //guestService.insertGuest(guest);
         switchMainWindow();
     }
 

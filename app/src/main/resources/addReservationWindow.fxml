@@ -11,8 +11,8 @@
         <Label layoutX="75.0" layoutY="220.0" prefHeight="17.0" prefWidth="97.0" text="Cena całkowita:"/>
         <TextField fx:id="reservationRoomId" layoutX="200.0" layoutY="81.0" prefHeight="25.0" prefWidth="160.0"/>
         <TextField fx:id="reservationGuestId" layoutX="200.0" layoutY="36.0" prefHeight="25.0" prefWidth="160.0"/>
-        <TextField fx:id="reservationStartDate" layoutX="200.0" layoutY="126.0" prefHeight="25.0" prefWidth="160.0"/>
-        <TextField fx:id="reservationEndDate" layoutX="200.0" layoutY="171.0" prefHeight="25.0" prefWidth="160.0"/>
+        <DateCell fx:id="reservationStartDate" layoutX="200.0" layoutY="126.0" prefHeight="25.0" prefWidth="160.0"/>
+        <DateCell fx:id="reservationEndDate" layoutX="200.0" layoutY="171.0" prefHeight="25.0" prefWidth="160.0"/>
         <TextField fx:id="reservationTotalPrice" layoutX="200.0" layoutY="216.0" prefHeight="25.0" prefWidth="160.0"/>
 
         <Button defaultButton="true" layoutX="53.0" layoutY="264.0" mnemonicParsing="false" onAction="#addReservation"

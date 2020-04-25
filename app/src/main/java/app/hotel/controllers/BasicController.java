@@ -15,20 +15,31 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 
 import static app.hotel.controllers.AuxiliaryController.changeScene;
 
 @Controller
 public class BasicController {
 
+    private static Stage primaryStage;
+    private static BorderPane mainLayout;
 
     @FXML
     private Tab rooms, guests, reservations, users;
@@ -40,7 +51,6 @@ public class BasicController {
 
     @FXML
     private TableColumn<Room, String>
-            roomId,
             roomNumber;
 
     @FXML
@@ -134,7 +144,8 @@ public class BasicController {
     }
 
     public void deleteRoom() {
-        System.out.println("Usuniety pokoj");
+        roomService.deleteRoom(getSelectedRoom());
+        refreshAll();
     }
 
     public void generateRoomRaport() {
@@ -153,7 +164,8 @@ public class BasicController {
     }
 
     public void deleteGuest() {
-        System.out.println("Usuniety chlop");
+        guestService.deleteGuest(getSelectedGuest());
+        refreshAll();
     }
 
     // ---- reservations ----
@@ -168,7 +180,8 @@ public class BasicController {
     }
 
     public void deleteReservation() {
-        System.out.println("delete reservation");
+        reservationService.deleteReservation(getSelectedReservation());
+        refreshAll();
     }
 
     public void generateReservationReport() {
@@ -193,7 +206,8 @@ public class BasicController {
     }
 
     public void deleteUser() {
-        System.out.println("Delete user");
+        userService.deleteUser(getSelectedUser());
+        refreshAll();
     }
 
     // ---- other methods ----
@@ -230,10 +244,10 @@ public class BasicController {
                 new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getId())
         );
         guestID.setCellValueFactory(reservationStringCellDataFeatures ->
-                new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getGuest().getSurname())
+                new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getGuestId())
         );
         roomID.setCellValueFactory(reservationStringCellDataFeatures ->
-                new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getRoom().getNumber())
+                new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getRoomId())
         );
         startDate.setCellValueFactory(reservationStringCellDataFeatures ->
                 new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getStartDate().toString())
@@ -253,9 +267,6 @@ public class BasicController {
         roomList.clear();
         roomList.addAll(roomService.getAllRooms());
 
-        roomID.setCellValueFactory(roomStringCellDataFeatures ->
-                new SimpleStringProperty(roomStringCellDataFeatures.getValue().getId())
-        );
         roomNumber.setCellValueFactory(roomStringCellDataFeatures ->
                 new SimpleStringProperty(roomStringCellDataFeatures.getValue().getNumber())
         );
