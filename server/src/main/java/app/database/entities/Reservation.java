@@ -22,4 +22,6 @@ public class Reservation {
     private float totalPrice;
     private boolean isPayed;
 
+
+
 }
