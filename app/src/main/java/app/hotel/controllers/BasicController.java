@@ -158,9 +158,25 @@ public class BasicController {
         changeScene(addGuestWindowLocation, 460, 360);
     }
 
-    public void switchModifyGuestWindow() {
+    public void switchModifyGuestWindow(ActionEvent event) throws IOException {
         URL modifyGuestWindowLocation = Main.class.getResource("/" + "modifyGuestWindow.fxml");
-        changeScene(modifyGuestWindowLocation, 460, 360);
+        //changeScene(modifyGuestWindowLocation, 460, 360);
+
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(modifyGuestWindowLocation);
+        Parent basic = loader.load();
+
+        Scene tableViewScene = new Scene(basic);
+
+        //access the controller and call a method
+        GuestController controller = loader.getController();
+        controller.initData(getSelectedGuest());
+
+        //This line gets the Stage information
+        Stage window = (Stage)((Node)event.getSource()).getScene().getWindow();
+
+        window.setScene(tableViewScene);
+        window.show();
     }
 
     public void deleteGuest() {

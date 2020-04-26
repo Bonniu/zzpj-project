@@ -33,6 +33,7 @@ public class GuestController {
         guest.setName(getGuestName().getText());
         guest.setSurname(getGuestSurname().getText());
         guest.setPhoneNumber(Integer.parseInt(getGuestPhonenumber().getText()));
+        System.out.println(Objects.isNull(guestService));
 
         guestService.insertGuest(guest);
         switchMainWindow();
@@ -48,14 +49,11 @@ public class GuestController {
 
     public void modifyGuest() {
 
-        /*
         selectedGuest.setName(guestName.getText());
         selectedGuest.setSurname(guestSurname.getText());
         selectedGuest.setPhoneNumber(Integer.parseInt(guestPhonenumber.getText()));
         System.out.println(Objects.isNull(guestService));
         guestService.updateGuest(selectedGuest);
-
-         */
         switchMainWindow();
 
     }
