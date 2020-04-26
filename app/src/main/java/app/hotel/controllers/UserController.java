@@ -1,9 +1,15 @@
 package app.hotel.controllers;
 
+import app.database.entities.Room;
+import app.database.entities.User;
+import app.hotel.dbcontroller.UserService;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+@Getter
 @Controller
 public class UserController {
 
@@ -14,10 +20,16 @@ public class UserController {
     @FXML
     private TextField userType;
 
+    @Autowired
+    private UserService userService;
 
     public void addUser() {
-        System.out.println("add user");
-        printTextFields();
+        User user = new User();
+        user.setName(getUserName().getText());
+        user.setSurname(getUserSurname().getText());
+        user.setUserType(getUserType().getText());
+
+        userService.insertUser(user);
         switchMainWindow();
     }
 
