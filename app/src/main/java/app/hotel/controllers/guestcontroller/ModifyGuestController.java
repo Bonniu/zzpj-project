@@ -57,24 +57,7 @@ public class ModifyGuestController implements InitializeController {
     }
 
     public void modifyGuest() {
-        try {
-            validator.validateUpdate(new HashMap<>() {{
-                put("phoneNumber", guestPhonenumber.getText());
-                put("discount", guestDiscount.getText());
-            }});
-        } catch (HotelException hotelException) {
-            generateAlert("Gość nie został zaktualizowany!",
-                    hotelException.displayErrors(),
-                    Alert.AlertType.ERROR);
-            return;
-        }
 
-        selectedGuest.setName(guestName.getText());
-        selectedGuest.setSurname(guestSurname.getText());
-        selectedGuest.setPhoneNumber(Integer.parseInt(guestPhonenumber.getText()));
-        selectedGuest.setDiscount(Integer.parseInt(guestDiscount.getText()));
-        guestService.update(selectedGuest);
-        switchMainWindow();
     }
 
     public void switchMainWindow() {
