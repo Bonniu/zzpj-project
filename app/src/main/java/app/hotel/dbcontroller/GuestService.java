@@ -10,11 +10,11 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/guests")
-public class GuestController {
+public class GuestService {
 
     private final GuestRepository guestRepository;
 
-    public GuestController(GuestRepository guestRepository) {
+    public GuestService(GuestRepository guestRepository) {
         this.guestRepository = guestRepository;
     }
 

@@ -30,7 +30,6 @@
                                 <Button layoutX="745.0" layoutY="335.0" mnemonicParsing="false" onAction="#generateRoomRaport" prefHeight="70.0" prefWidth="150.0" style="-fx-background-color: #c499cc; -fx-font-size: 12pt;" text="Raport" />
                                 <TableView fx:id="roomsTable" editable="true" layoutX="15.0" layoutY="15.0" prefHeight="660.0" prefWidth="700.0">
                                     <columns>
-                                        <TableColumn fx:id="roomId" minWidth="40.0" prefWidth="150.0" resizable="false" text="ID" />
                                         <TableColumn fx:id="roomNumber" minWidth="40.0" prefWidth="100.0" resizable="false" text="Numer pokoju" />
                                         <TableColumn fx:id="roomCapacity" minWidth="40.0" prefWidth="100.0" resizable="false" text="Pojemność" />
                                         <TableColumn fx:id="roomPurchasePrice" minWidth="40.0" prefWidth="150.0" resizable="false" text="Cena pokoju (za dzień)" />

@@ -14,6 +14,7 @@ public class Room {
     private String number;
     private int capacity;
     private float price;
+    private Boolean state;
 
 
 }

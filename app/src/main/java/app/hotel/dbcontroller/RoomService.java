@@ -9,10 +9,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/rooms")
-public class RoomController {
+public class RoomService {
     private RoomRepository roomRepository;
 
-    public RoomController(RoomRepository roomRepository) {
+    public RoomService(RoomRepository roomRepository) {
         this.roomRepository = roomRepository;
     }
 
