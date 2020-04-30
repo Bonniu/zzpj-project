@@ -140,7 +140,7 @@ public class BasicController {
 
     public void switchModifyRoomWindow() {
         URL modifyRoomWindowLocation = Main.class.getResource("/" + "modifyRoomWindow.fxml");
-        changeScene(modifyRoomWindowLocation, 460, 360);
+        changeScene(modifyRoomWindowLocation, 460, 360,getSelectedRoom());
     }
 
     public void deleteRoom() {
@@ -159,24 +159,10 @@ public class BasicController {
     }
 
     public void switchModifyGuestWindow(ActionEvent event) throws IOException {
+
         URL modifyGuestWindowLocation = Main.class.getResource("/" + "modifyGuestWindow.fxml");
-        //changeScene(modifyGuestWindowLocation, 460, 360);
+        changeScene(modifyGuestWindowLocation, 460, 360,getSelectedGuest());
 
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(modifyGuestWindowLocation);
-        Parent basic = loader.load();
-
-        Scene tableViewScene = new Scene(basic);
-
-        //access the controller and call a method
-        GuestController controller = loader.getController();
-        controller.initData(getSelectedGuest());
-
-        //This line gets the Stage information
-        Stage window = (Stage)((Node)event.getSource()).getScene().getWindow();
-
-        window.setScene(tableViewScene);
-        window.show();
     }
 
     public void deleteGuest() {
@@ -191,8 +177,9 @@ public class BasicController {
     }
 
     public void switchModifyReservationWindow() {
+        Reservation reservation = getSelectedReservation();
         URL modifyReservationWindowLocation = Main.class.getResource("/" + "modifyReservationWindow.fxml");
-        changeScene(modifyReservationWindowLocation, 460, 360);
+        changeScene(modifyReservationWindowLocation, 460, 360, reservation);
     }
 
     public void deleteReservation() {
@@ -218,7 +205,7 @@ public class BasicController {
 
     public void switchModifyUserWindow() {
         URL modifyUserWindowLocation = Main.class.getResource("/" + "modifyUserWindow.fxml");
-        changeScene(modifyUserWindowLocation, 460, 360);
+        changeScene(modifyUserWindowLocation, 460, 360,getSelectedUser());
     }
 
     public void deleteUser() {

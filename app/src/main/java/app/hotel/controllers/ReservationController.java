@@ -4,23 +4,31 @@ import app.database.api.CurrencyService;
 import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.hotel.dbcontroller.ReservationService;
+import com.sun.javafx.scene.control.DoubleField;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.util.StringConverter;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import java.net.URL;
+import java.sql.Date;
+import java.text.DateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 @Getter
 @Controller
-public class ReservationController implements Initializable {
+public class ReservationController implements Initializable,ModifyController {
 
     @FXML
     private Label currencyValue;
@@ -35,55 +43,67 @@ public class ReservationController implements Initializable {
     private TextField reservationRoomId;
 
     @FXML
-    private DateCell reservationStartDate;
+    private TextField reservationStartDate;
 
     @FXML
-    private DateCell reservationEndDate;
+    private TextField reservationEndDate;
 
     @FXML
     private TextField reservationTotalPrice;
 
     @FXML
-    private DateCell reservationDateFrom;
+    private TextField reservationDateFrom;
 
     @FXML
-    private DateCell reservationDateTo;
+    private TextField reservationDateTo;
 
     @FXML
-    private ChoiceBox<String> possibleCurrency;
+    private TextField reservationIdPayed;
+
+    @FXML
+    private ComboBox<String> possibleCurrency;
 
     private final CurrencyService currencyService;
+    private final ReservationService reservationService;
+
+    private Reservation selectedReservation;
 
     @Autowired
-    public ReservationController(CurrencyService currencyService) {
+    public ReservationController(CurrencyService currencyService, ReservationService reservationService) {
         this.currencyService = currencyService;
+        this.reservationService = reservationService;
     }
 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.possibleCurrency.setItems(InitCurrency());
-        this.possibleCurrency.getSelectionModel().selectFirst();
-        this.currencyService.getCurrency();
+        InitPayForReservationWindow();
     }
-
-    @Autowired
-    private ReservationService reservationService;
 
     public void addReservation() {
         Reservation reservation = new Reservation();
         reservation.setRoomId(getReservationRoomId().getText());
         reservation.setGuestId(getReservationGuestId().getText());
-        //reservation.setStartDate(getReservationStartDate());
+        reservation.setStartDate(Date.valueOf(getReservationStartDate().getText()));
+        reservation.setEndDate(Date.valueOf(getReservationEndDate().getText()));
+        reservation.setTotalPrice(Float.parseFloat(getReservationTotalPrice().getText()));
+        reservation.setPayed(false);
 
-        //guestService.insertGuest(guest);
+        reservationService.insertReservation(reservation);
         switchMainWindow();
     }
 
     public void modifyReservation() {
-        //TODO
-        System.out.println("reservation controller modify");
-        printTextFields();
+        //DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-yy")
+        selectedReservation.setId(reservationId.getText());
+        selectedReservation.setRoomId(reservationRoomId.getText());
+        selectedReservation.setGuestId(reservationGuestId.getText());
+        selectedReservation.setStartDate(Date.valueOf(reservationStartDate.getText()));
+        selectedReservation.setEndDate(Date.valueOf(reservationEndDate.getText()));
+        selectedReservation.setTotalPrice(Float.parseFloat(reservationTotalPrice.getText()));
+        selectedReservation.setPayed(Boolean.parseBoolean(reservationIdPayed.getText()));
+
+        reservationService.updateReservation(selectedReservation);
         switchMainWindow();
     }
 
@@ -97,6 +117,17 @@ public class ReservationController implements Initializable {
         System.out.println("paid from user");
         // printTextFields();
         switchMainWindow();
+    }
+
+    private void InitPayForReservationWindow(){
+        if(possibleCurrency == null)
+            return;
+
+        ObservableList<String> observableList = FXCollections.observableArrayList();
+        observableList.addAll(currencyService.getPossibleRates());
+
+        this.possibleCurrency.setItems(observableList);
+        this.possibleCurrency.getSelectionModel().selectFirst();
     }
 
     public void rateValue() {
@@ -131,8 +162,6 @@ public class ReservationController implements Initializable {
     public void printTextFields() {
         System.out.println(reservationGuestId.getText());
         System.out.println(reservationRoomId.getText());
-        System.out.println(reservationStartDate.getText());
-        System.out.println(reservationEndDate.getText());
         System.out.println(reservationTotalPrice.getText());
 
     }
@@ -142,4 +171,16 @@ public class ReservationController implements Initializable {
     }
 
 
+    @Override
+    public void initData(Object object) {
+        Reservation reservation = (Reservation) object;
+        selectedReservation = reservation;
+        reservationId.setText(selectedReservation.getId());
+        reservationGuestId.setText(selectedReservation.getGuestId());
+        reservationRoomId.setText(selectedReservation.getRoomId());
+        reservationStartDate.setText(selectedReservation.getStartDate().toString());
+        reservationEndDate.setText(selectedReservation.getEndDate().toString());
+        reservationTotalPrice.setText(String.valueOf(selectedReservation.getTotalPrice()));
+        reservationIdPayed.setText(String.valueOf(selectedReservation.isPayed()));
+    }
 }

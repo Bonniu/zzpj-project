@@ -7,17 +7,22 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.stereotype.Controller;
 
 @Getter
 @Controller
-public class RoomController {
+public class RoomController implements ModifyController {
     @FXML
     private TextField roomNumber;
     @FXML
     private TextField roomCapacity;
     @FXML
     private TextField roomPrice;
+    @FXML
+    private TextField roomState;
+
+    private Room selectedRoom;
 
     @Autowired
     private RoomService roomService;
@@ -34,8 +39,12 @@ public class RoomController {
     }
 
     public void modifyRoom() {
-        System.out.println("modify room");
-        printTextFields();
+        selectedRoom.setNumber(roomNumber.getText());
+        selectedRoom.setCapacity(Integer.parseInt(roomCapacity.getText()));
+        selectedRoom.setPrice(Float.parseFloat(roomPrice.getText()));
+        selectedRoom.setState(Boolean.parseBoolean(roomState.getText()));
+
+        roomService.updateRoom(selectedRoom);
         switchMainWindow();
     }
 
@@ -49,4 +58,14 @@ public class RoomController {
         AuxiliaryController.switchMainWindow();
     }
 
+    @Override
+    public void initData(Object object) {
+        Room room = (Room) object;
+        selectedRoom = room;
+        roomNumber.setText(selectedRoom.getNumber());
+        roomCapacity.setText(String.valueOf(selectedRoom.getCapacity()));
+        roomPrice.setText(String.valueOf(selectedRoom.getPrice()));
+        roomState.setText(String.valueOf(selectedRoom.getState()));
+
+    }
 }

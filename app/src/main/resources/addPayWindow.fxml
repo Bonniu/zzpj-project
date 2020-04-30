@@ -12,7 +12,7 @@
         <Label fx:id="currencyValue" layoutX="199.0" layoutY="220.0" prefHeight="17.0" prefWidth="99.0" text="5 ziko" />
         <TextField fx:id="reservationId" layoutX="199.0" layoutY="57.0" prefHeight="25.0" prefWidth="160.0" />
         <TextField fx:id="reservationTotalPrice" layoutX="199.0" layoutY="95.0" prefHeight="25.0" prefWidth="160.0" />
-        <ChoiceBox fx:id="possibleCurrency" layoutX="199.0" layoutY="170.0" prefHeight="25.0" prefWidth="160.0" onAction="#rateValue" />
+        <ComboBox fx:id="possibleCurrency" layoutX="199.0" layoutY="170.0" prefHeight="25.0" prefWidth="160.0" onAction="#rateValue" />
 
         <Button defaultButton="true" layoutX="53.0" layoutY="264.0" mnemonicParsing="false" onAction="#payForReservation" prefHeight="48.0" prefWidth="135.0" style="-fx-background-color: #3DCC91; -fx-font-size: 11pt;" text="Zatwierdź" />
         <Button layoutX="272.0" layoutY="264.0" mnemonicParsing="false" onAction="#switchMainWindow" prefHeight="48.0" prefWidth="135.0" style="-fx-font-size: 11pt;" text="Powrót do menu" />

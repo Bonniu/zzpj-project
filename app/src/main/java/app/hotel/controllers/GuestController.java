@@ -9,12 +9,15 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
 
 @Getter
 @Controller
-public class GuestController {
+public class GuestController implements ModifyController{
 
     @FXML
     private TextField guestName;
@@ -39,8 +42,9 @@ public class GuestController {
         switchMainWindow();
     }
 
-    public  void initData(Guest guest)
+    public void initData(Object object)
     {
+        Guest guest = (Guest)object;
         selectedGuest = guest;
         guestName.setText(selectedGuest.getName());
         guestSurname.setText(selectedGuest.getSurname());
@@ -52,10 +56,8 @@ public class GuestController {
         selectedGuest.setName(guestName.getText());
         selectedGuest.setSurname(guestSurname.getText());
         selectedGuest.setPhoneNumber(Integer.parseInt(guestPhonenumber.getText()));
-        System.out.println(Objects.isNull(guestService));
         guestService.updateGuest(selectedGuest);
         switchMainWindow();
-
     }
 
     public void printTextFields() {
@@ -67,6 +69,5 @@ public class GuestController {
     public void switchMainWindow() {
         AuxiliaryController.switchMainWindow();
     }
-
 
 }
