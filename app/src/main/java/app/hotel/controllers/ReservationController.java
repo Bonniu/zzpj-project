@@ -3,31 +3,40 @@ package app.hotel.controllers;
 import app.database.api.CurrencyService;
 import app.database.entities.Guest;
 import app.database.entities.Reservation;
+import app.database.entities.Room;
 import app.hotel.dbcontroller.ReservationService;
-import com.sun.javafx.scene.control.DoubleField;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.util.StringConverter;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import javax.swing.text.DateFormatter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.ResourceBundle;
+
+@SuppressWarnings(value = "unchecked")
 
 @Getter
 @Controller
-public class ReservationController implements Initializable,ModifyController {
+public class ReservationController implements Initializable, ModifyController {
 
     @FXML
     private Label currencyValue;
@@ -37,6 +46,12 @@ public class ReservationController implements Initializable,ModifyController {
 
     @FXML
     private TextField reservationGuestId;
+
+    @FXML
+    private ChoiceBox choiceBoxGuestId;
+
+    @FXML
+    private ChoiceBox choiceBoxRoomId;
 
     @FXML
     private TextField reservationRoomId;
@@ -67,6 +82,7 @@ public class ReservationController implements Initializable,ModifyController {
 
     private Reservation selectedReservation;
 
+    private ObservableList<Reservation> reservations;
 
     @Autowired
     public ReservationController(CurrencyService currencyService, ReservationService reservationService) {
@@ -81,11 +97,25 @@ public class ReservationController implements Initializable,ModifyController {
     }
 
     public void addReservation() {
+
+        if (getReservationStartDate().getValue().isAfter(getReservationEndDate().getValue())
+                || getReservationStartDate().getValue().isEqual(getReservationEndDate().getValue())) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Błąd");
+            alert.setHeaderText("Błąd");
+            alert.setContentText("Data rozpoczęcia musi być przed datą zakończenia!");
+            alert.showAndWait();
+            return;
+        }
         Reservation reservation = new Reservation();
-        reservation.setRoomId(getReservationRoomId().getText());
-        reservation.setGuestId(getReservationGuestId().getText());
-        reservation.setStartDate(LocalDate.parse(getReservationStartDate().getEditor().toString()));
-        reservation.setEndDate(LocalDate.parse(getReservationEndDate().getEditor().toString()));
+        Guest g = (Guest) getChoiceBoxGuestId().getSelectionModel().getSelectedItem();
+        Room r = (Room) getChoiceBoxRoomId().getSelectionModel().getSelectedItem();
+        reservation.setGuestId(g.getPidn());
+        reservation.setRoomId(r.getNumber());
+        reservation.setStartDate(LocalDate.parse(getReservationStartDate().getValue().toString()));
+        reservation.setEndDate(LocalDate.parse(getReservationEndDate().getValue().toString()));
+
+        // liczenie ? mamy room i dni
         reservation.setTotalPrice(Float.parseFloat(getReservationTotalPrice().getText()));
         reservation.setPayed(false);
 
@@ -103,19 +133,19 @@ public class ReservationController implements Initializable,ModifyController {
         selectedReservation.setId(reservationId.getText());
         selectedReservation.setRoomId(reservationRoomId.getText());
         selectedReservation.setGuestId(reservationGuestId.getText());
-        if(reservationStartDate.getValue() == null){
-            Date date =  originalFormat.parse(reservationStartDate.getEditor().getText());
+        if (reservationStartDate.getValue() == null) {
+            Date date = originalFormat.parse(reservationStartDate.getEditor().getText());
             String formattedDate = targetFormat.format(date);
             selectedReservation.setStartDate(LocalDate.parse(formattedDate));
-        }else{
+        } else {
             selectedReservation.setStartDate(LocalDate.parse(formatter.format(reservationStartDate.getValue())));
         }
 
-        if(reservationEndDate.getValue() == null){
-            Date date =  originalFormat.parse(reservationEndDate.getEditor().getText());
+        if (reservationEndDate.getValue() == null) {
+            Date date = originalFormat.parse(reservationEndDate.getEditor().getText());
             String formattedDate = targetFormat.format(date);
             selectedReservation.setEndDate(LocalDate.parse(formattedDate));
-        }else{
+        } else {
             selectedReservation.setEndDate(LocalDate.parse(formatter.format(reservationEndDate.getValue())));
         }
         selectedReservation.setTotalPrice(Float.parseFloat(reservationTotalPrice.getText()));
@@ -137,8 +167,8 @@ public class ReservationController implements Initializable,ModifyController {
         switchMainWindow();
     }
 
-    private void InitPayForReservationWindow(){
-        if(possibleCurrency == null)
+    private void InitPayForReservationWindow() {
+        if (possibleCurrency == null)
             return;
 
         ObservableList<String> observableList = FXCollections.observableArrayList();
@@ -154,9 +184,9 @@ public class ReservationController implements Initializable,ModifyController {
 
             String convertedVal = String.valueOf(
                     currencyService
-                    .getStrategyFactory()
-                    .findStrategy(possibleCurrency.getValue())
-                    .rateMoney(30, currencyService.getCurrencyRestModel().getRates()));     //TODO HARDCODED CASH
+                            .getStrategyFactory()
+                            .findStrategy(possibleCurrency.getValue())
+                            .rateMoney(30, currencyService.getCurrencyRestModel().getRates()));     //TODO HARDCODED CASH
 
             currencyValue.setText(convertedVal);
         }
@@ -175,6 +205,20 @@ public class ReservationController implements Initializable,ModifyController {
             alert.setContentText("Co najmniej jedna z podanych dat nie zgadza się z podanym wzorem!");
             alert.showAndWait();
         }
+        System.out.println(reservations);
+        Document document = new Document();
+        try {
+            int h = LocalDateTime.now().getHour();
+            int m = LocalDateTime.now().getMinute();
+            String s = "reservation_report_" + LocalDate.now().toString() + "_" + h + "-" + m;
+            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(s + ".pdf"));
+            document.open();
+            document.add(new Paragraph("A Hello World PDF document."));
+            document.close();
+            writer.close();
+        } catch (DocumentException | FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public void printTextFields() {
@@ -188,14 +232,44 @@ public class ReservationController implements Initializable,ModifyController {
         AuxiliaryController.switchMainWindow();
     }
 
-
+    // tak wiem troche XD
     @Override
     public void initData(Object object) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        //modify reservation
+        try {
+            selectedReservation = (Reservation) object;
+            modifyReservationSetData(formatter);
+        } catch (ClassCastException ignored) {
 
-        Reservation reservation = (Reservation) object;
-        selectedReservation = reservation;
+        }
+
+        // add reservation
+        try {
+            ArrayList<Object> objectList = (ArrayList<Object>) object;
+            ObservableList<Guest> guestList = (ObservableList<Guest>) objectList.get(0);
+            ObservableList<Room> roomList = (ObservableList<Room>) objectList.get(1);
+            choiceBoxSetData(guestList, roomList);
+        } catch (ClassCastException ignored) {
+
+        }
+
+        // generate raport
+        try {
+            reservations = (ObservableList<Reservation>) object;
+        } catch (ClassCastException ignored) {
+
+        }
+    }
+
+    private void choiceBoxSetData(ObservableList<Guest> guestList, ObservableList<Room> roomList) {
+        choiceBoxGuestId.setItems(guestList);
+        choiceBoxRoomId.setItems(roomList);
+    }
+
+
+    private void modifyReservationSetData(DateTimeFormatter formatter) {
         reservationId.setText(selectedReservation.getId());
         reservationGuestId.setText(selectedReservation.getGuestId());
         reservationRoomId.setText(selectedReservation.getRoomId());

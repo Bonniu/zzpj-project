@@ -9,6 +9,10 @@ import app.hotel.dbcontroller.GuestService;
 import app.hotel.dbcontroller.ReservationService;
 import app.hotel.dbcontroller.RoomService;
 import app.hotel.dbcontroller.UserService;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleFloatProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -17,10 +21,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -29,9 +29,13 @@ import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Objects;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import static app.hotel.controllers.AuxiliaryController.changeScene;
 
@@ -54,11 +58,11 @@ public class BasicController {
             roomNumber;
 
     @FXML
-    private TableColumn<Room,Number> roomCapacity;
+    private TableColumn<Room, Number> roomCapacity;
     @FXML
-    private TableColumn<Room,Number> roomPurchasePrice;
+    private TableColumn<Room, Number> roomPurchasePrice;
     @FXML
-    private TableColumn<Room,Boolean> roomState;
+    private TableColumn<Room, Boolean> roomState;
 
     @FXML
     public Room getSelectedRoom() {
@@ -91,9 +95,9 @@ public class BasicController {
             endDate;
 
     @FXML
-    private TableColumn<Reservation,Number> totalPrice;
+    private TableColumn<Reservation, Number> totalPrice;
     @FXML
-    private TableColumn<Reservation,Boolean> isPayed;
+    private TableColumn<Reservation, Boolean> isPayed;
 
     @FXML
     public Reservation getSelectedReservation() {
@@ -140,7 +144,7 @@ public class BasicController {
 
     public void switchModifyRoomWindow() {
         URL modifyRoomWindowLocation = Main.class.getResource("/" + "modifyRoomWindow.fxml");
-        changeScene(modifyRoomWindowLocation, 460, 360,getSelectedRoom());
+        changeScene(modifyRoomWindowLocation, 460, 360, getSelectedRoom());
     }
 
     public void deleteRoom() {
@@ -149,7 +153,25 @@ public class BasicController {
     }
 
     public void generateRoomRaport() {
+
+        ObservableList<Room> items = roomsTable.getItems();
+        ArrayList<Room> list = new ArrayList<>(items);
+        System.out.println(list.toString());
         System.out.println("raport pokoi");
+
+        Document document = new Document();
+        try {
+            int h = LocalDateTime.now().getHour();
+            int m = LocalDateTime.now().getMinute();
+            String s = "room_report_" + LocalDate.now().toString() + "_" + h + "-" + m;
+            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(s + ".pdf"));
+            document.open();
+            document.add(new Paragraph("A Hello World PDF document."));
+            document.close();
+            writer.close();
+        } catch (DocumentException | FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     // ----guests----
@@ -161,7 +183,7 @@ public class BasicController {
     public void switchModifyGuestWindow(ActionEvent event) throws IOException {
 
         URL modifyGuestWindowLocation = Main.class.getResource("/" + "modifyGuestWindow.fxml");
-        changeScene(modifyGuestWindowLocation, 460, 360,getSelectedGuest());
+        changeScene(modifyGuestWindowLocation, 460, 360, getSelectedGuest());
 
     }
 
@@ -171,9 +193,12 @@ public class BasicController {
     }
 
     // ---- reservations ----
-    public void switchAddReservationWindow() {
+    public void switchAddReservationWindow() throws IOException {
         URL addReservationWindowLocation = Main.class.getResource("/" + "addReservationWindow.fxml");
-        changeScene(addReservationWindowLocation, 460, 360);
+        ArrayList<Object> list = new ArrayList<>();
+        list.add(guestsTable.getItems());
+        list.add(roomsTable.getItems());
+        changeScene(addReservationWindowLocation, 460, 360, list);
     }
 
     public void switchModifyReservationWindow() {
@@ -189,7 +214,7 @@ public class BasicController {
 
     public void generateReservationReport() {
         URL reservationReportWindowLocation = Main.class.getResource("/" + "reservationReportWindow.fxml");
-        changeScene(reservationReportWindowLocation, 460, 360);
+        changeScene(reservationReportWindowLocation, 460, 360, reservationList);
     }
 
     public void paidWindow() {
@@ -205,7 +230,7 @@ public class BasicController {
 
     public void switchModifyUserWindow() {
         URL modifyUserWindowLocation = Main.class.getResource("/" + "modifyUserWindow.fxml");
-        changeScene(modifyUserWindowLocation, 460, 360,getSelectedUser());
+        changeScene(modifyUserWindowLocation, 460, 360, getSelectedUser());
     }
 
     public void deleteUser() {
