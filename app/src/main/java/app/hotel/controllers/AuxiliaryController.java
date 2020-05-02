@@ -1,6 +1,7 @@
 package app.hotel.controllers;
 
 import app.hotel.Main;
+import javafx.scene.control.Alert;
 
 import java.io.IOException;
 import java.net.URL;
@@ -28,4 +29,13 @@ public class AuxiliaryController {
             e.printStackTrace();
         }
     }
+
+    public static void generateError(String text) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Błąd");
+        alert.setHeaderText("Błąd");
+        alert.setContentText(text);
+        alert.showAndWait();
+    }
+
 }

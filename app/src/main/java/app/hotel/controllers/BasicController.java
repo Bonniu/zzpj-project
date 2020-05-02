@@ -9,6 +9,7 @@ import app.hotel.dbcontroller.GuestService;
 import app.hotel.dbcontroller.ReservationService;
 import app.hotel.dbcontroller.RoomService;
 import app.hotel.dbcontroller.UserService;
+import app.hotel.reportmakers.RoomReport;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
@@ -21,6 +22,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -36,11 +38,12 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 import static app.hotel.controllers.AuxiliaryController.changeScene;
 
 @Controller
-public class BasicController {
+public class BasicController implements Initializable {
 
     private static Stage primaryStage;
     private static BorderPane mainLayout;
@@ -153,25 +156,8 @@ public class BasicController {
     }
 
     public void generateRoomRaport() {
-
-        ObservableList<Room> items = roomsTable.getItems();
-        ArrayList<Room> list = new ArrayList<>(items);
-        System.out.println(list.toString());
-        System.out.println("raport pokoi");
-
-        Document document = new Document();
-        try {
-            int h = LocalDateTime.now().getHour();
-            int m = LocalDateTime.now().getMinute();
-            String s = "room_report_" + LocalDate.now().toString() + "_" + h + "-" + m;
-            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(s + ".pdf"));
-            document.open();
-            document.add(new Paragraph("A Hello World PDF document."));
-            document.close();
-            writer.close();
-        } catch (DocumentException | FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        RoomReport rr = new RoomReport(roomsTable.getItems());
+        rr.generateReport();
     }
 
     // ----guests----
@@ -331,4 +317,8 @@ public class BasicController {
     }
 
 
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        refreshAll();
+    }
 }

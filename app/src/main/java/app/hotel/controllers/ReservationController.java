@@ -4,11 +4,8 @@ import app.database.api.CurrencyService;
 import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.database.entities.Room;
+import app.hotel.reportmakers.ReservationReport;
 import app.hotel.dbcontroller.ReservationService;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfWriter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -18,19 +15,17 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.ResourceBundle;
+
+import static app.hotel.controllers.AuxiliaryController.generateError;
 
 @SuppressWarnings(value = "unchecked")
 
@@ -60,16 +55,16 @@ public class ReservationController implements Initializable, ModifyController {
     private DatePicker reservationStartDate;
 
     @FXML
+    private DatePicker reservationDateFrom;
+
+    @FXML
+    private DatePicker reservationDateTo;
+
+    @FXML
     private DatePicker reservationEndDate;
 
     @FXML
     private TextField reservationTotalPrice;
-
-    @FXML
-    private TextField reservationDateFrom;
-
-    @FXML
-    private TextField reservationDateTo;
 
     @FXML
     private TextField reservationIdPayed;
@@ -96,15 +91,12 @@ public class ReservationController implements Initializable, ModifyController {
         InitPayForReservationWindow();
     }
 
+
     public void addReservation() {
 
         if (getReservationStartDate().getValue().isAfter(getReservationEndDate().getValue())
                 || getReservationStartDate().getValue().isEqual(getReservationEndDate().getValue())) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Błąd");
-            alert.setHeaderText("Błąd");
-            alert.setContentText("Data rozpoczęcia musi być przed datą zakończenia!");
-            alert.showAndWait();
+            generateError("Data rozpoczęcia musi być przed datą zakończenia rezerwacji!");
             return;
         }
         Reservation reservation = new Reservation();
@@ -192,33 +184,15 @@ public class ReservationController implements Initializable, ModifyController {
         }
     }
 
-    public void generateReport() {
-        //TODO
-        System.out.println("reservation controller generate report");
-        String regex = "[0-3][0-9].[0-1][0-9].[0-9][0-9][0-9][0-9]";
-        if (reservationDateFrom.getText().matches(regex) && reservationDateTo.getText().matches(regex))
-            switchMainWindow();
-        else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Błąd");
-            alert.setHeaderText("Błąd");
-            alert.setContentText("Co najmniej jedna z podanych dat nie zgadza się z podanym wzorem!");
-            alert.showAndWait();
-        }
-        System.out.println(reservations);
-        Document document = new Document();
-        try {
-            int h = LocalDateTime.now().getHour();
-            int m = LocalDateTime.now().getMinute();
-            String s = "reservation_report_" + LocalDate.now().toString() + "_" + h + "-" + m;
-            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(s + ".pdf"));
-            document.open();
-            document.add(new Paragraph("A Hello World PDF document."));
-            document.close();
-            writer.close();
-        } catch (DocumentException | FileNotFoundException e) {
-            e.printStackTrace();
-        }
+    public void generateReportButtonFunction() {
+        ReservationReport rr = new ReservationReport(
+                getReservationDateFrom().getValue(),
+                getReservationDateTo().getValue(),
+                reservations);
+
+        rr.generateReport();
+        switchMainWindow();
+
     }
 
     public void printTextFields() {
