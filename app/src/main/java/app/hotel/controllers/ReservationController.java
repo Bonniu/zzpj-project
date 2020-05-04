@@ -172,8 +172,6 @@ public class ReservationController implements Initializable, ModifyController {
 
     public void rateValue() {
         if (currencyService.getCurrencyRestModel() != null) {
-            System.out.println(possibleCurrency.getValue());
-
             String convertedVal = String.valueOf(
                     currencyService
                             .getStrategyFactory()

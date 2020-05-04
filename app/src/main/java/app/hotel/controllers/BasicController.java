@@ -230,35 +230,7 @@ public class BasicController implements Initializable {
         refreshAll();
     }
 
-    // ---- other methods ----
-    public void refreshAll() {
-
-        //////////////GUEST/////////////////////////
-        guestList.clear();
-        guestList.addAll(guestService.getAllGuests());
-
-        guestId.setCellValueFactory(guestStringCellDataFeatures ->
-                new SimpleStringProperty(guestStringCellDataFeatures.getValue().getPidn())
-        );
-
-        guestName.setCellValueFactory(guestStringCellDataFeatures ->
-                new SimpleStringProperty(guestStringCellDataFeatures.getValue().getName())
-        );
-
-        guestSurname.setCellValueFactory(guestStringCellDataFeatures ->
-                new SimpleStringProperty(guestStringCellDataFeatures.getValue().getSurname())
-        );
-
-        guestPhonenumber.setCellValueFactory(guestStringCellDataFeatures ->
-                new SimpleStringProperty(String.valueOf(guestStringCellDataFeatures.getValue().getPhoneNumber())));
-        //TODO discount
-        guestDiscount.setCellValueFactory(guestStringCellDataFeatures ->
-                new SimpleStringProperty(String.valueOf(guestStringCellDataFeatures.getValue().getPhoneNumber())));
-        guestsTable.setItems(guestList);
-
-        /////////////RESERVATION//////////////////////////
-        reservationList.clear();
-        reservationList.addAll(reservationService.getAllReservations());
+    public void warningRefreshReservations(){
         List<Reservation> outdatedReservations = reservationService.getOutdatedNoPaidReservation();
         if(outdatedReservations.size() != 0){
             String ids = outdatedReservations.stream().
@@ -270,6 +242,13 @@ public class BasicController implements Initializable {
             alert.setContentText("consider remove reservations: " + ids);
             alert.showAndWait();
         }
+        refreshReservations();
+    }
+    public void refreshReservations(){
+        /////////////RESERVATION//////////////////////////
+        reservationList.clear();
+        reservationList.addAll(reservationService.getAllReservations());
+
 
         reservationId.setCellValueFactory(reservationStringCellDataFeatures ->
                 new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getId())
@@ -293,6 +272,35 @@ public class BasicController implements Initializable {
                 new SimpleBooleanProperty(reservationBooleanProperty.getValue().isPayed())
         );
         reservationsTable.setItems(reservationList);
+    }
+
+    // ---- other methods ----
+    public void refreshAll() {
+
+        //////////////GUEST/////////////////////////
+        guestList.clear();
+        guestList.addAll(guestService.getAllGuests());
+
+        guestId.setCellValueFactory(guestStringCellDataFeatures ->
+                new SimpleStringProperty(guestStringCellDataFeatures.getValue().getPidn())
+        );
+
+        guestName.setCellValueFactory(guestStringCellDataFeatures ->
+                new SimpleStringProperty(guestStringCellDataFeatures.getValue().getName())
+        );
+
+        guestSurname.setCellValueFactory(guestStringCellDataFeatures ->
+                new SimpleStringProperty(guestStringCellDataFeatures.getValue().getSurname())
+        );
+
+        guestPhonenumber.setCellValueFactory(guestStringCellDataFeatures ->
+                new SimpleStringProperty(String.valueOf(guestStringCellDataFeatures.getValue().getPhoneNumber())));
+
+        guestDiscount.setCellValueFactory(guestStringCellDataFeatures ->
+                new SimpleStringProperty(String.valueOf(guestStringCellDataFeatures.getValue().getDiscount())));
+
+        guestsTable.setItems(guestList);
+
 
         /////////////ROOM//////////////////////////
         roomList.clear();
@@ -312,6 +320,8 @@ public class BasicController implements Initializable {
                 new SimpleBooleanProperty(roomBooleanCellDataFeatures.getValue().getState())
         );
         roomsTable.setItems(roomList);
+
+        refreshReservations();
 
         /////////////USER//////////////////////////
         userList.clear();
