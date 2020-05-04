@@ -5,11 +5,11 @@ import app.database.repositories.ReservationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@RestController
-@RequestMapping(value = "/reservations")
+@Service
 public class ReservationService {
 
     private ReservationRepository reservationRepository;
@@ -18,30 +18,31 @@ public class ReservationService {
         this.reservationRepository = reservationRepository;
     }
 
-    @GetMapping("/allReservations")
     public List<Reservation> getAllReservations() {
         List<Reservation> reservations = this.reservationRepository.findAll();
         return reservations;
     }
 
-    @GetMapping("/{id}")
-    public Optional<Reservation> getReservationById( @PathVariable("id") String id) {
+    public List<Reservation> getOutdatedNoPaidReservation(){
+        return this.reservationRepository.
+                getReservationsByStartDateBeforeAndIsPayed(LocalDate.now().plusDays(2), false);
+    }
+
+    public Optional<Reservation> getReservationById(String id) {
         Optional<Reservation> reservation = this.reservationRepository.findById(id);
         return reservation;
     }
 
-    @PostMapping
-    public void insertReservation(@RequestBody Reservation reservation) {
+
+    public void insertReservation(Reservation reservation) {
         this.reservationRepository.insert(reservation);
     }
 
-    @PutMapping
-    public void updateReservation(@RequestBody Reservation reservation) {
+    public void updateReservation(Reservation reservation) {
         this.reservationRepository.save(reservation);
     }
 
-    @DeleteMapping
-    public void deleteReservation(@RequestBody Reservation reservation) {
+    public void deleteReservation(Reservation reservation) {
         this.reservationRepository.delete(reservation);
     }
 }
