@@ -20,6 +20,8 @@ import java.util.Objects;
 public class GuestController implements ModifyController{
 
     @FXML
+    public TextField guestDiscount;
+    @FXML
     private TextField guestName;
     @FXML
     private TextField guestSurname;
@@ -36,6 +38,7 @@ public class GuestController implements ModifyController{
         guest.setName(getGuestName().getText());
         guest.setSurname(getGuestSurname().getText());
         guest.setPhoneNumber(Integer.parseInt(getGuestPhonenumber().getText()));
+        guest.setDiscount(Integer.parseInt(getGuestDiscount().getText()));
         System.out.println(Objects.isNull(guestService));
 
         guestService.insertGuest(guest);
@@ -49,6 +52,7 @@ public class GuestController implements ModifyController{
         guestName.setText(selectedGuest.getName());
         guestSurname.setText(selectedGuest.getSurname());
         guestPhonenumber.setText(String.valueOf(selectedGuest.getPhoneNumber()));
+        guestDiscount.setText(String.valueOf(selectedGuest.getDiscount()));
     }
 
     public void modifyGuest() {
@@ -56,7 +60,9 @@ public class GuestController implements ModifyController{
         selectedGuest.setName(guestName.getText());
         selectedGuest.setSurname(guestSurname.getText());
         selectedGuest.setPhoneNumber(Integer.parseInt(guestPhonenumber.getText()));
+        selectedGuest.setDiscount(Integer.parseInt(getGuestDiscount().getText()));
         guestService.updateGuest(selectedGuest);
+
         switchMainWindow();
     }
 
