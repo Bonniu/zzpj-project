@@ -23,6 +23,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -38,7 +39,9 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import static app.hotel.controllers.AuxiliaryController.changeScene;
 
@@ -66,6 +69,13 @@ public class BasicController implements Initializable {
     private TableColumn<Room, Number> roomPurchasePrice;
     @FXML
     private TableColumn<Room, Boolean> roomState;
+
+    public BasicController(GuestService guestService, ReservationService reservationService, RoomService roomService, UserService userService) {
+        this.guestService = guestService;
+        this.reservationService = reservationService;
+        this.roomService = roomService;
+        this.userService = userService;
+    }
 
     @FXML
     public Room getSelectedRoom() {
@@ -123,14 +133,10 @@ public class BasicController implements Initializable {
     }
 
     //DB
-    @Autowired
-    private GuestService guestService;
-    @Autowired
-    private ReservationService reservationService;
-    @Autowired
-    private RoomService roomService;
-    @Autowired
-    private UserService userService;
+    private final GuestService guestService;
+    private final ReservationService reservationService;
+    private final RoomService roomService;
+    private final UserService userService;
 
     private ObservableList<Guest> guestList = FXCollections.observableArrayList();
     private ObservableList<Reservation> reservationList = FXCollections.observableArrayList();
@@ -253,6 +259,17 @@ public class BasicController implements Initializable {
         /////////////RESERVATION//////////////////////////
         reservationList.clear();
         reservationList.addAll(reservationService.getAllReservations());
+        List<Reservation> outdatedReservations = reservationService.getOutdatedNoPaidReservation();
+        if(outdatedReservations.size() != 0){
+            String ids = outdatedReservations.stream().
+                    map( reservation -> reservation.getId() + ",\n")
+                    .collect(Collectors.joining(""));
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Attention!");
+            alert.setHeaderText("Some reservations are outdated");
+            alert.setContentText("consider remove reservations: " + ids);
+            alert.showAndWait();
+        }
 
         reservationId.setCellValueFactory(reservationStringCellDataFeatures ->
                 new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getId())
