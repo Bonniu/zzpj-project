@@ -1,13 +1,11 @@
 package app.hotel.controllers;
 
-import app.database.entities.Guest;
 import app.database.entities.Room;
-import app.hotel.dbcontroller.RoomService;
+import app.hotel.dbservices.RoomService;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.stereotype.Controller;
 
 @Getter

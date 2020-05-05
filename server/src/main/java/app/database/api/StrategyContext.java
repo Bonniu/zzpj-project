@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class StrategyFactory {
+public class StrategyContext {
 
     private Map<String, Exchange> strategies;
 
-    public StrategyFactory(Set<Exchange> strategySet) {
+    public StrategyContext(Set<Exchange> strategySet) {
         strategies = new HashMap<String, Exchange>();
         strategySet.forEach(
                 strategy ->strategies.put(strategy.getStrategyName(), strategy));

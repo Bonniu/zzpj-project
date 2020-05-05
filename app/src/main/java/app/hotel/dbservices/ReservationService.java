@@ -1,9 +1,8 @@
-package app.hotel.dbcontroller;
+package app.hotel.dbservices;
 
 import app.database.entities.Reservation;
 import app.database.repositories.ReservationRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;

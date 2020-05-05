@@ -16,12 +16,12 @@ public class CurrencyService {
     private static final String API_KEY = "5b34a02bed9a1306cfc730dcabc881ad";
     private final RestTemplate restTemplate;
     private CurrencyRestModel currencyRestModel;
-    private final StrategyFactory strategyFactory;
+    private final StrategyContext strategyContext;
 
     @Autowired
-    public CurrencyService(RestTemplate restTemplate, StrategyFactory strategyFactory) {
+    public CurrencyService(RestTemplate restTemplate, StrategyContext strategyContext) {
         this.restTemplate = restTemplate;
-        this.strategyFactory = strategyFactory;
+        this.strategyContext = strategyContext;
     }
 
     public void getCurrency() {
@@ -41,8 +41,8 @@ public class CurrencyService {
         return arrayList;
     }
 
-    public StrategyFactory getStrategyFactory() {
-        return strategyFactory;
+    public StrategyContext getStrategyContext() {
+        return strategyContext;
     }
 
     public CurrencyRestModel getCurrencyRestModel() {

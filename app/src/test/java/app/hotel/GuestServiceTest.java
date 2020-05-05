@@ -1,4 +1,4 @@
-package app.hotel.dbcontroller;
+package app.hotel;
 
 import org.junit.Test;
 
