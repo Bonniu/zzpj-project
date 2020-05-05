@@ -1,15 +1,14 @@
-package app.hotel.dbcontroller;
+package app.hotel.dbservices;
 
 import app.database.entities.Guest;
 import app.database.repositories.GuestRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@RestController
-@RequestMapping(value = "/guests")
+@Service
 public class GuestService {
 
     private final GuestRepository guestRepository;
@@ -18,27 +17,22 @@ public class GuestService {
         this.guestRepository = guestRepository;
     }
 
-    @GetMapping("/allGuests")
     public List<Guest> getAllGuests() {
         return guestRepository.findAll();
     }
 
-    @GetMapping("/guest/{id}")
-    public Optional<Guest> getGuestById(@PathVariable("id") String id) {
+    public Optional<Guest> getGuestById(String id) {
         return this.guestRepository.findById(id);
     }
 
-    @PostMapping
     public void insertGuest(@RequestBody Guest guest) {
         this.guestRepository.insert(guest);
     }
 
-    @PutMapping
     public void updateGuest(@RequestBody Guest guest) {
         this.guestRepository.save(guest);
     }
 
-    @DeleteMapping
     public void deleteGuest(@RequestBody Guest guest) {
         this.guestRepository.delete(guest);
     }

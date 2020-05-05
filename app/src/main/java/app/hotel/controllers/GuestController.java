@@ -1,18 +1,13 @@
 package app.hotel.controllers;
 
 import app.database.entities.Guest;
-import app.hotel.dbcontroller.GuestService;
-import com.sun.javafx.scene.control.IntegerField;
+import app.hotel.dbservices.GuestService;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
 
 @Getter

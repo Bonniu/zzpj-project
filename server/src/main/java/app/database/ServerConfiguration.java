@@ -1,7 +1,7 @@
 package app.database;
 
 
-import app.database.api.StrategyFactory;
+import app.database.api.StrategyContext;
 import app.database.api.strategy.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +19,7 @@ public class ServerConfiguration {
     }
 
     @Bean
-    public StrategyFactory strategyFactory() {
+    public StrategyContext strategyFactory() {
         Set<Exchange> exchanges = new HashSet<>();
         exchanges.add(new USDExchange());
         exchanges.add(new PLNExchange());
@@ -28,6 +28,6 @@ public class ServerConfiguration {
         exchanges.add(new EURExchange());
         exchanges.add(new CADExchange());
 
-        return new StrategyFactory(exchanges);
+        return new StrategyContext(exchanges);
     }
 }

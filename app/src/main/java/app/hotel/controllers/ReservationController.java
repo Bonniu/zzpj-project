@@ -5,7 +5,7 @@ import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.database.entities.Room;
 import app.hotel.reportmakers.ReservationReport;
-import app.hotel.dbcontroller.ReservationService;
+import app.hotel.dbservices.ReservationService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -174,7 +174,7 @@ public class ReservationController implements Initializable, ModifyController {
         if (currencyService.getCurrencyRestModel() != null) {
             String convertedVal = String.valueOf(
                     currencyService
-                            .getStrategyFactory()
+                            .getStrategyContext()
                             .findStrategy(possibleCurrency.getValue())
                             .rateMoney(30, currencyService.getCurrencyRestModel().getRates()));     //TODO HARDCODED CASH
 

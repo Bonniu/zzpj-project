@@ -1,8 +1,7 @@
 package app.hotel.controllers;
 
-import app.database.entities.Room;
 import app.database.entities.User;
-import app.hotel.dbcontroller.UserService;
+import app.hotel.dbservices.UserService;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import lombok.Getter;
