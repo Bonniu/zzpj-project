@@ -90,7 +90,7 @@ public class ReservationReport {
 
     private void addUnfinishedReservations(Document d) throws DocumentException {
         ArrayList<Reservation> notFinished = reservations.stream()
-                .filter(x -> !x.getEndDate().isAfter(LocalDate.now()))
+                .filter(x -> x.getEndDate().isAfter(LocalDate.now()))
                 .collect(Collectors.toCollection(ArrayList::new));
         List orderedList = new List(List.ORDERED);
         for (Reservation r : notFinished)
@@ -102,7 +102,7 @@ public class ReservationReport {
 
     private void addFinishedReservations(Document d) throws DocumentException {
         ArrayList<Reservation> finished = reservations.stream()
-                .filter(x -> x.getEndDate().isAfter(LocalDate.now()))
+                .filter(x -> !x.getEndDate().isAfter(LocalDate.now()))
                 .collect(Collectors.toCollection(ArrayList::new));
         List orderedList = new List(List.ORDERED);
         for (Reservation r : finished)
