@@ -2,7 +2,9 @@ package app.hotel.controllers;
 
 import app.database.entities.Room;
 import app.hotel.dbservices.RoomService;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,7 @@ public class RoomController implements ModifyController {
     @FXML
     private TextField roomPrice;
     @FXML
-    private TextField roomState;
+    private ChoiceBox roomStateChoiceBox;
 
     private Room selectedRoom;
 
@@ -40,23 +42,26 @@ public class RoomController implements ModifyController {
         selectedRoom.setNumber(roomNumber.getText());
         selectedRoom.setCapacity(Integer.parseInt(roomCapacity.getText()));
         selectedRoom.setPrice(Float.parseFloat(roomPrice.getText()));
-        selectedRoom.setState(roomState.getText());
+        selectedRoom.setState((String) roomStateChoiceBox.getSelectionModel().getSelectedItem());
 
         roomService.updateRoom(selectedRoom);
         switchMainWindow();
+
     }
 
     public void switchMainWindow() {
         AuxiliaryController.switchMainWindow();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void initData(Object object) {
-        Room room = (Room) object;
-        selectedRoom = room;
+        selectedRoom = (Room) object;
         roomNumber.setText(selectedRoom.getNumber());
         roomCapacity.setText(String.valueOf(selectedRoom.getCapacity()));
         roomPrice.setText(String.valueOf(selectedRoom.getPrice()));
-        roomState.setText(String.valueOf(selectedRoom.getState()));
+        roomStateChoiceBox.setItems(FXCollections.observableArrayList("dostępny", "niedostępny", "zajęty"));
+        roomStateChoiceBox.getSelectionModel().select(selectedRoom.getState());
+
     }
 }
