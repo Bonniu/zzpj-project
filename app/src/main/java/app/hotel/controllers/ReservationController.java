@@ -94,6 +94,7 @@ public class ReservationController implements Initializable, ModifyController {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         InitPayForReservationWindow();
+        reservationEndDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
     }
 
 
@@ -112,12 +113,24 @@ public class ReservationController implements Initializable, ModifyController {
         reservation.setStartDate(LocalDate.parse(getReservationStartDate().getValue().toString()));
         reservation.setEndDate(LocalDate.parse(getReservationEndDate().getValue().toString()));
 
-        // liczenie ? mamy room i dni
         reservation.setTotalPrice(Float.parseFloat(getReservationTotalPrice().getText()));
         reservation.setPayed(false);
 
         reservationService.insertReservation(reservation);
         switchMainWindow();
+    }
+
+    private void totalPriceOfReservation()
+    {
+        Room room = (Room) getChoiceBoxRoomId().getSelectionModel().getSelectedItem();
+        LocalDate startDate = LocalDate.parse(getReservationStartDate().getValue().toString());
+        LocalDate endDate = LocalDate.parse(getReservationEndDate().getValue().toString());
+
+        Long daysBetween = DAYS.between(startDate,endDate);
+        Float roomPrice = room.getPrice();
+        double totalPrice = daysBetween * roomPrice;
+        totalPrice = Math.round(totalPrice*100.0)/100.0;
+        reservationTotalPrice.setText(String.valueOf(totalPrice));
     }
 
     public void modifyReservation() throws ParseException {
