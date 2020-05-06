@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.ResourceBundle;
 
-import static app.hotel.controllers.AuxiliaryController.generateError;
+import static app.hotel.controllers.AuxiliaryController.generateAlert;
+
 
 @SuppressWarnings(value = "unchecked")
 
@@ -96,7 +97,7 @@ public class ReservationController implements Initializable, ModifyController {
 
         if (getReservationStartDate().getValue().isAfter(getReservationEndDate().getValue())
                 || getReservationStartDate().getValue().isEqual(getReservationEndDate().getValue())) {
-            generateError("Data rozpoczęcia musi być przed datą zakończenia rezerwacji!");
+            generateAlert("", "Data rozpoczęcia musi być przed datą zakończenia rezerwacji!", Alert.AlertType.ERROR);
             return;
         }
         Reservation reservation = new Reservation();

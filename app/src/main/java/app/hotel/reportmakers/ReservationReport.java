@@ -4,10 +4,9 @@ import app.database.entities.Reservation;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfWriter;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -15,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-import static app.hotel.controllers.AuxiliaryController.generateError;
+import static app.hotel.controllers.AuxiliaryController.generateAlert;
 
 public class ReservationReport {
 
@@ -46,10 +45,10 @@ public class ReservationReport {
 
     public void generateReport() {
         if (reportDateFrom.isAfter(reportDateTo)) {
-            generateError("Data początkowa musi być wcześniej niż data zakończenia");
+            generateAlert( "Błąd", "Data początkowa musi być wcześniej niż data zakończenia", Alert.AlertType.ERROR);
             return;
         }
-        //TODO refactor (duplicate code)
+
         Document document = new Document();
         try {
             PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(getFileName()));
@@ -57,6 +56,7 @@ public class ReservationReport {
             fillDocument(document);
             document.close();
             writer.close();
+            generateAlert("", "Pomyślnie utworzono raport o nazwie " + getFileName(), Alert.AlertType.CONFIRMATION);
         } catch (DocumentException | IOException e) {
             e.printStackTrace();
         }

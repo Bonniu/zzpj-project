@@ -30,6 +30,7 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 import static app.hotel.controllers.AuxiliaryController.changeScene;
+import static app.hotel.controllers.AuxiliaryController.generateAlert;
 
 @Controller
 public class BasicController implements Initializable {
@@ -180,11 +181,10 @@ public class BasicController implements Initializable {
             String ids = outdatedReservations.stream().
                     map(reservation -> reservation.getId() + ",\n")
                     .collect(Collectors.joining(""));
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Attention!");
-            alert.setHeaderText("Some reservations are outdated");
-            alert.setContentText("consider remove reservations: " + ids);
-            alert.showAndWait();
+            generateAlert("Some reservations are outdated",
+                    "consider remove reservations: " + ids,
+                    Alert.AlertType.WARNING);
+
         }
         refreshReservations();
     }
