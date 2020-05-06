@@ -30,10 +30,27 @@ public class AuxiliaryController {
         }
     }
 
-    public static void generateError(String text) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Błąd");
-        alert.setHeaderText("Błąd");
+    public static void generateAlert(String headerText, String text, Alert.AlertType alertType) {
+        String title;
+        switch (alertType) {
+            case ERROR:
+                title = "Błąd";
+                break;
+            case WARNING:
+                title = "Ostrzeżenie";
+                break;
+            case CONFIRMATION:
+                title = "Potwierdzenie";
+                break;
+            case INFORMATION:
+                title = "Informacja";
+                break;
+            default:
+                title = "Alert";
+        }
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
         alert.setContentText(text);
         alert.showAndWait();
     }

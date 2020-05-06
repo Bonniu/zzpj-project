@@ -3,12 +3,10 @@ package app.hotel.controllers;
 import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.database.entities.Room;
-import app.database.entities.User;
 import app.hotel.Main;
 import app.hotel.dbservices.GuestService;
 import app.hotel.dbservices.ReservationService;
 import app.hotel.dbservices.RoomService;
-import app.hotel.dbservices.UserService;
 import app.hotel.reportmakers.RoomReport;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleFloatProperty;
@@ -20,11 +18,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
 import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
@@ -35,17 +30,10 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 import static app.hotel.controllers.AuxiliaryController.changeScene;
+import static app.hotel.controllers.AuxiliaryController.generateAlert;
 
 @Controller
 public class BasicController implements Initializable {
-
-    private static Stage primaryStage;
-    private static BorderPane mainLayout;
-
-    @FXML
-    private Tab rooms, guests, reservations, users;
-    @FXML
-    private URL location;
 
     @FXML
     private TableView<Room> roomsTable;
@@ -59,13 +47,12 @@ public class BasicController implements Initializable {
     @FXML
     private TableColumn<Room, Number> roomPurchasePrice;
     @FXML
-    private TableColumn<Room, Boolean> roomState;
+    private TableColumn<Room, String> roomState;
 
-    public BasicController(GuestService guestService, ReservationService reservationService, RoomService roomService, UserService userService) {
+    public BasicController(GuestService guestService, ReservationService reservationService, RoomService roomService) {
         this.guestService = guestService;
         this.reservationService = reservationService;
         this.roomService = roomService;
-        this.userService = userService;
     }
 
     @FXML
@@ -108,31 +95,14 @@ public class BasicController implements Initializable {
         return reservationsTable.getSelectionModel().getSelectedItem();
     }
 
-
-    @FXML
-    private TableView<User> usersTable;
-    @FXML
-    private TableColumn<User, String>
-            userId,
-            userFirstName,
-            userLastName,
-            userType;
-
-    @FXML
-    public User getSelectedUser() {
-        return usersTable.getSelectionModel().getSelectedItem();
-    }
-
     //DB
     private final GuestService guestService;
     private final ReservationService reservationService;
     private final RoomService roomService;
-    private final UserService userService;
 
     private ObservableList<Guest> guestList = FXCollections.observableArrayList();
     private ObservableList<Reservation> reservationList = FXCollections.observableArrayList();
     private ObservableList<Room> roomList = FXCollections.observableArrayList();
-    private ObservableList<User> userList = FXCollections.observableArrayList();
 
 
     // ---- methods ------------------------------------------------------------------------------------------------
@@ -202,7 +172,11 @@ public class BasicController implements Initializable {
 
     public void generateReservationReport() {
         URL reservationReportWindowLocation = Main.class.getResource("/" + "reservationReportWindow.fxml");
-        changeScene(reservationReportWindowLocation, 460, 360, reservationList);
+        ArrayList<Object> list = new ArrayList<>();
+        list.add(guestService);
+        list.add(roomService);
+        list.add(reservationService);
+        changeScene(reservationReportWindowLocation, 460, 360, list);
     }
 
     public void paidWindow() {
@@ -210,37 +184,21 @@ public class BasicController implements Initializable {
         changeScene(addPayWindowLocation, 460, 360);
     }
 
-    // ---- users ----
-    public void switchAddUserWindow() {
-        URL addUserWindowLocation = Main.class.getResource("/" + "addUserWindow.fxml");
-        changeScene(addUserWindowLocation, 460, 360);
-    }
-
-    public void switchModifyUserWindow() {
-        URL modifyUserWindowLocation = Main.class.getResource("/" + "modifyUserWindow.fxml");
-        changeScene(modifyUserWindowLocation, 460, 360, getSelectedUser());
-    }
-
-    public void deleteUser() {
-        userService.deleteUser(getSelectedUser());
-        refreshAll();
-    }
-
-    public void warningRefreshReservations(){
+    public void warningRefreshReservations() {
         List<Reservation> outdatedReservations = reservationService.getOutdatedNoPaidReservation();
-        if(outdatedReservations.size() != 0){
+        if (outdatedReservations.size() != 0) {
             String ids = outdatedReservations.stream().
-                    map( reservation -> reservation.getId() + ",\n")
+                    map(reservation -> reservation.getId() + ",\n")
                     .collect(Collectors.joining(""));
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Attention!");
-            alert.setHeaderText("Some reservations are outdated");
-            alert.setContentText("consider remove reservations: " + ids);
-            alert.showAndWait();
+            generateAlert("Some reservations are outdated",
+                    "consider remove reservations: " + ids,
+                    Alert.AlertType.WARNING);
+
         }
         refreshReservations();
     }
-    public void refreshReservations(){
+
+    public void refreshReservations() {
         /////////////RESERVATION//////////////////////////
         reservationList.clear();
         reservationList.addAll(reservationService.getAllReservations());
@@ -312,31 +270,13 @@ public class BasicController implements Initializable {
         roomPurchasePrice.setCellValueFactory(roomFloatCellDataFeatures ->
                 new SimpleFloatProperty(roomFloatCellDataFeatures.getValue().getPrice())
         );
-        roomState.setCellValueFactory(roomBooleanCellDataFeatures ->
-                new SimpleBooleanProperty(roomBooleanCellDataFeatures.getValue().getState())
+        roomState.setCellValueFactory(roomStringCellDataFeatures ->
+                new SimpleStringProperty(roomStringCellDataFeatures.getValue().getState())
         );
+
         roomsTable.setItems(roomList);
 
         refreshReservations();
-
-        /////////////USER//////////////////////////
-        userList.clear();
-        userList.addAll(userService.getAllUsers());
-
-        userId.setCellValueFactory(roomStringCellDataFeatures ->
-                new SimpleStringProperty(roomStringCellDataFeatures.getValue().getId())
-        );
-        userFirstName.setCellValueFactory(roomStringCellDataFeatures ->
-                new SimpleStringProperty(roomStringCellDataFeatures.getValue().getName())
-        );
-        userLastName.setCellValueFactory(roomStringCellDataFeatures ->
-                new SimpleStringProperty(roomStringCellDataFeatures.getValue().getSurname())
-        );
-        userType.setCellValueFactory(roomStringCellDataFeatures ->
-                new SimpleStringProperty(roomStringCellDataFeatures.getValue().getUserType())
-        );
-
-        usersTable.setItems(userList);
     }
 
 

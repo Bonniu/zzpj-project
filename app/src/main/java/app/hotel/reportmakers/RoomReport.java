@@ -1,11 +1,11 @@
 package app.hotel.reportmakers;
 
-import app.database.entities.Reservation;
 import app.database.entities.Room;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfWriter;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,6 +13,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+
+import static app.hotel.controllers.AuxiliaryController.generateAlert;
 
 public class RoomReport {
 
@@ -35,7 +37,6 @@ public class RoomReport {
     }
 
     public void generateReport() {
-        //TODO refactor (duplicate code)
         Document document = new Document();
         try {
             PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(getFileName()));
@@ -43,8 +44,10 @@ public class RoomReport {
             fillDocument(document);
             document.close();
             writer.close();
+            generateAlert("", "Pomyślnie utworzono raport o nazwie " + getFileName(), Alert.AlertType.CONFIRMATION);
         } catch (DocumentException | IOException e) {
             e.printStackTrace();
+            generateAlert("", "Błąd poczas tworzenia raportu rezerwacji! ", Alert.AlertType.ERROR);
         }
     }
 
@@ -52,6 +55,7 @@ public class RoomReport {
         addHeading(d);
         addAvailableRooms(d);
         addUnavailableRooms(d);
+        addOccupiedRooms(d);
     }
 
     private void addHeading(Document d) {
@@ -65,19 +69,48 @@ public class RoomReport {
     }
 
     private void addAvailableRooms(Document d) throws DocumentException {
-        long availableRooms = rooms.stream()
-                .filter(Room::getState).count();
+        ArrayList<Room> availableRooms = rooms.stream()
+                .filter(x -> x.getState().equals("dostępny")).collect(Collectors.toCollection(ArrayList::new));
 
-        String paragraph = "Wolne pokoje: " + availableRooms;
+        String paragraph = "Wolne pokoje - " + availableRooms.size();
+        if (availableRooms.size() != 0)
+            paragraph += ": ";
         d.add(new Paragraph(paragraph, polishFont));
+
+        addListedRooms(d, availableRooms);
     }
 
     private void addUnavailableRooms(Document d) throws DocumentException {
-        long unavailableRooms = rooms.stream()
-                .filter(x -> !x.getState()).count();
+        ArrayList<Room> unavailableRooms = rooms.stream()
+                .filter(x -> x.getState().equals("niedostępny")).collect(Collectors.toCollection(ArrayList::new));
 
-        String paragraph = "Niedostępne pokoje: " + unavailableRooms;
+        String paragraph = "Niedostępne pokoje - " + unavailableRooms.size();
+        if (unavailableRooms.size() != 0)
+            paragraph += ": ";
         d.add(new Paragraph(paragraph, polishFont));
+
+        addListedRooms(d, unavailableRooms);
+    }
+
+    private void addOccupiedRooms(Document d) throws DocumentException {
+        ArrayList<Room> occupiedRooms = rooms.stream()
+                .filter(x -> x.getState().equals("zajęty")).collect(Collectors.toCollection(ArrayList::new));
+
+        String paragraph = "Zajęte pokoje - " + occupiedRooms.size();
+        if (occupiedRooms.size() != 0)
+            paragraph += ": ";
+        d.add(new Paragraph(paragraph, polishFont));
+
+        addListedRooms(d, occupiedRooms);
+
+    }
+
+    public void addListedRooms(Document d, ArrayList<Room> rooms) throws DocumentException {
+        List orderedList = new List(List.UNORDERED);
+        for (Room r : rooms)
+            orderedList.add(new ListItem(r.getNumber()));
+        if (rooms.size() != 0)
+            d.add(orderedList);
     }
 
     private String getFileName() {
