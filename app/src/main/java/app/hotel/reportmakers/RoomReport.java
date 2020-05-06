@@ -45,8 +45,9 @@ public class RoomReport {
             document.close();
             writer.close();
             generateAlert("", "Pomyślnie utworzono raport o nazwie " + getFileName(), Alert.AlertType.CONFIRMATION);
-        } catch (DocumentException | IOException ignored) {
-
+        } catch (DocumentException | IOException e) {
+            e.printStackTrace();
+            generateAlert("", "Błąd poczas tworzenia raportu rezerwacji! ", Alert.AlertType.ERROR);
         }
     }
 

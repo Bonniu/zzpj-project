@@ -65,9 +65,10 @@ public class ReservationReport {
             fillDocument(document);
             document.close();
             writer.close();
-            generateAlert("", "Pomyślnie utworzono raport o nazwie " + getFileName(), Alert.AlertType.CONFIRMATION);
+            generateAlert("", "Pomyślnie utworzono raport o nazwie " + getFileName(), Alert.AlertType.INFORMATION);
         } catch (DocumentException | IOException e) {
             e.printStackTrace();
+            generateAlert("", "Błąd poczas tworzenia raportu rezerwacji! ", Alert.AlertType.ERROR);
         }
     }
 
@@ -167,7 +168,11 @@ public class ReservationReport {
             room = rooms.getRoomById(reservation.getRoomId()).get();
 
         return reservation.getId() +
-                " - Gość: " +
+                " (" +
+                reservation.getStartDate() +
+                " - " +
+                reservation.getEndDate() +
+                ") - Gość: " +
                 guest.getName() +
                 " " +
                 guest.getSurname() +
