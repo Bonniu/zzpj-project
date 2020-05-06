@@ -55,7 +55,9 @@ public class GuestController implements ModifyController{
         selectedGuest.setName(guestName.getText());
         selectedGuest.setSurname(guestSurname.getText());
         selectedGuest.setPhoneNumber(Integer.parseInt(guestPhonenumber.getText()));
-        selectedGuest.setDiscount(Integer.parseInt(getGuestDiscount().getText()));
+        selectedGuest.setDiscount(0);
+        //TODO
+       // selectedGuest.setDiscount(Integer.parseInt(getGuestDiscount().getText()));
         guestService.updateGuest(selectedGuest);
 
         switchMainWindow();

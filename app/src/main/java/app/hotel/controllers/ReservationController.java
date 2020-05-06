@@ -4,7 +4,9 @@ import app.database.api.CurrencyService;
 import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.database.entities.Room;
+import app.hotel.dbservices.GuestService;
 import app.hotel.dbservices.ReservationService;
+import app.hotel.dbservices.RoomService;
 import app.hotel.reportmakers.ReservationReport;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -78,7 +80,9 @@ public class ReservationController implements Initializable, ModifyController {
 
     private Reservation selectedReservation;
 
-    private ObservableList<Reservation> reservations;
+    private ReservationService reservations;
+    private RoomService rooms;
+    private GuestService guests;
 
     @Autowired
     public ReservationController(CurrencyService currencyService, ReservationService reservationService) {
@@ -184,10 +188,19 @@ public class ReservationController implements Initializable, ModifyController {
     }
 
     public void generateReportButtonFunction() {
-        ReservationReport rr = new ReservationReport(
-                getReservationDateFrom().getValue(),
-                getReservationDateTo().getValue(),
-                reservations);
+        LocalDate dateFrom = getReservationDateFrom().getValue();
+        LocalDate dateTo = getReservationDateTo().getValue();
+
+        if (dateFrom == null && dateTo == null) {
+            generateAlert("", "Jedna z podanych dat nie może być pusta", Alert.AlertType.INFORMATION);
+            return;
+        }
+        if (dateFrom == null)
+            dateFrom = LocalDate.of(1900, 1, 1);
+        if (dateTo == null)
+            dateTo = LocalDate.of(2100, 1, 1);
+
+        ReservationReport rr = new ReservationReport(dateFrom, dateTo, reservations, rooms, guests);
 
         rr.generateReport();
         switchMainWindow();
@@ -231,7 +244,10 @@ public class ReservationController implements Initializable, ModifyController {
 
         // generate raport
         try {
-            reservations = (ObservableList<Reservation>) object;
+            ArrayList<Object> objectList = (ArrayList<Object>) object;
+            guests = (GuestService) objectList.get(0);
+            rooms = (RoomService) objectList.get(1);
+            reservations = (ReservationService) objectList.get(2);
         } catch (ClassCastException ignored) {
 
         }
