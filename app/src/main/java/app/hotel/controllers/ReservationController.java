@@ -41,8 +41,6 @@ public class ReservationController implements Initializable, ModifyController {
     @FXML
     private TextField reservationId;
 
-    @FXML
-    private TextField reservationGuestId;
 
     @FXML
     private ChoiceBox choiceBoxGuestId;
@@ -50,17 +48,10 @@ public class ReservationController implements Initializable, ModifyController {
     @FXML
     private ChoiceBox choiceBoxRoomId;
 
-    @FXML
-    private TextField reservationRoomId;
 
     @FXML
     private DatePicker reservationStartDate;
 
-    @FXML
-    private DatePicker reservationDateFrom;
-
-    @FXML
-    private DatePicker reservationDateTo;
 
     @FXML
     private DatePicker reservationEndDate;
@@ -120,7 +111,7 @@ public class ReservationController implements Initializable, ModifyController {
     private void totalPriceOfReservation()
     {
         Room room = (Room) getChoiceBoxRoomId().getSelectionModel().getSelectedItem();
-        LocalDate startDate = LocalDate.parse(getReservationStartDate().getValue().toString());
+        LocalDate startDate = LocalDate.parse(reservationStartDate.getValue().toString());
         LocalDate endDate = LocalDate.parse(getReservationEndDate().getValue().toString());
 
         Long daysBetween = DAYS.between(startDate,endDate);
@@ -138,8 +129,10 @@ public class ReservationController implements Initializable, ModifyController {
         DateFormat targetFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         selectedReservation.setId(reservationId.getText());
-        selectedReservation.setRoomId(reservationRoomId.getText());
-        selectedReservation.setGuestId(reservationGuestId.getText());
+        Room room = (Room) choiceBoxRoomId.getSelectionModel().getSelectedItem();
+        selectedReservation.setRoomId(room.getNumber());
+        Guest guest = (Guest) choiceBoxGuestId.getSelectionModel().getSelectedItem();
+        selectedReservation.setGuestId(guest.getPidn());
         if (reservationStartDate.getValue() == null) {
             Date date = originalFormat.parse(reservationStartDate.getEditor().getText());
             String formattedDate = targetFormat.format(date);
@@ -199,8 +192,8 @@ public class ReservationController implements Initializable, ModifyController {
 
     public void generateReportButtonFunction() {
         ReservationReport rr = new ReservationReport(
-                getReservationDateFrom().getValue(),
-                getReservationDateTo().getValue(),
+                getReservationStartDate().getValue(),
+                getReservationEndDate().getValue(),
                 reservations);
 
         rr.generateReport();
@@ -208,12 +201,6 @@ public class ReservationController implements Initializable, ModifyController {
 
     }
 
-    public void printTextFields() {
-        System.out.println(reservationGuestId.getText());
-        System.out.println(reservationRoomId.getText());
-        System.out.println(reservationTotalPrice.getText());
-
-    }
 
     public void switchMainWindow() {
         AuxiliaryController.switchMainWindow();
@@ -223,11 +210,34 @@ public class ReservationController implements Initializable, ModifyController {
     @Override
     public void initData(Object object) {
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         //modify reservation
         try {
-            selectedReservation = (Reservation) object;
-            modifyReservationSetData(formatter);
+            ArrayList<Object> objectList = (ArrayList<Object>) object;
+            selectedReservation = (Reservation) objectList.get(0);
+            ObservableList<Guest> guestList = (ObservableList<Guest>) objectList.get(1);
+            ObservableList<Room> roomList = (ObservableList<Room>) objectList.get(2);
+
+            int i = 0;
+            int guestIndex = 0;
+            for (Guest guest: guestList) {
+                if(guest.getPidn().equals(selectedReservation.getGuestId())){
+                    guestIndex = i;
+                }
+                i++;
+            }
+            i = 0;
+
+            int roomIndex = 0;
+            for (Room room: roomList) {
+                if(room.getNumber().equals(selectedReservation.getRoomId())){
+                    roomIndex = i;
+                }
+                i++;
+            }
+
+            
+            choiceBoxSetData(guestList, roomList);
+            modifyReservationSetData(guestIndex, roomIndex);
         } catch (ClassCastException ignored) {
 
         }
@@ -256,12 +266,13 @@ public class ReservationController implements Initializable, ModifyController {
     }
 
 
-    private void modifyReservationSetData(DateTimeFormatter formatter) {
+    private void modifyReservationSetData(int guestIndex, int roomIndex) {
+
         reservationId.setText(selectedReservation.getId());
-        reservationGuestId.setText(selectedReservation.getGuestId());
-        reservationRoomId.setText(selectedReservation.getRoomId());
-        reservationStartDate.getEditor().setText(formatter.format(selectedReservation.getStartDate()));
-        reservationEndDate.getEditor().setText(formatter.format(selectedReservation.getEndDate()));
+        choiceBoxGuestId.getSelectionModel().select(guestIndex);
+        choiceBoxRoomId.getSelectionModel().select(roomIndex);
+        reservationStartDate.setValue(selectedReservation.getStartDate());
+        reservationEndDate.setValue(selectedReservation.getEndDate());
         reservationTotalPrice.setText(String.valueOf(selectedReservation.getTotalPrice()));
         reservationIdPayed.setText(String.valueOf(selectedReservation.isPayed()));
     }

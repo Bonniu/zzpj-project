@@ -21,8 +21,8 @@
                 <Font size="17.0"/>
             </font>
         </Label>
-        <DatePicker fx:id="reservationDateFrom" layoutX="199.0" layoutY="57.0" prefHeight="25.0" prefWidth="160.0"/>
-        <DatePicker fx:id="reservationDateTo" layoutX="199.0" layoutY="155.0" prefHeight="25.0" prefWidth="160.0"/>
+        <DatePicker fx:id="reservationStartDate" layoutX="199.0" layoutY="57.0" prefHeight="25.0" prefWidth="160.0"/>
+        <DatePicker fx:id="reservationEndDate" layoutX="199.0" layoutY="155.0" prefHeight="25.0" prefWidth="160.0"/>
         <Button defaultButton="true" layoutX="53.0" layoutY="264.0" mnemonicParsing="false" onAction="#generateReportButtonFunction"
                 prefHeight="48.0" prefWidth="135.0" style="-fx-background-color: #c499cc; -fx-font-size: 11pt;"
                 text="Zatwierdź"/>
