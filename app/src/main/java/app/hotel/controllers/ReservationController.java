@@ -4,8 +4,8 @@ import app.database.api.CurrencyService;
 import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.database.entities.Room;
-import app.hotel.reportmakers.ReservationReport;
 import app.hotel.dbservices.ReservationService;
+import app.hotel.reportmakers.ReservationReport;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -221,7 +221,8 @@ public class ReservationController implements Initializable, ModifyController {
         try {
             ArrayList<Object> objectList = (ArrayList<Object>) object;
             ObservableList<Guest> guestList = (ObservableList<Guest>) objectList.get(0);
-            ObservableList<Room> roomList = (ObservableList<Room>) objectList.get(1);
+            ObservableList<Room> roomList = ((ObservableList<Room>) objectList.get(1))
+                    .filtered(x -> !x.getState().equals("niedostępny")); //filtrowanie niedostępnych pokojów
             choiceBoxSetData(guestList, roomList);
         } catch (ClassCastException ignored) {
 

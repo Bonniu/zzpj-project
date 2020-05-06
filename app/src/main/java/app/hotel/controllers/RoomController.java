@@ -46,12 +46,6 @@ public class RoomController implements ModifyController {
         switchMainWindow();
     }
 
-    public void printTextFields() {
-        System.out.println(roomNumber.getText());
-        System.out.println(roomCapacity.getText());
-        System.out.println(roomPrice.getText());
-    }
-
     public void switchMainWindow() {
         AuxiliaryController.switchMainWindow();
     }
@@ -64,6 +58,5 @@ public class RoomController implements ModifyController {
         roomCapacity.setText(String.valueOf(selectedRoom.getCapacity()));
         roomPrice.setText(String.valueOf(selectedRoom.getPrice()));
         roomState.setText(String.valueOf(selectedRoom.getState()));
-
     }
 }
