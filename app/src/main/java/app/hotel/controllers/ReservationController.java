@@ -4,8 +4,10 @@ import app.database.api.CurrencyService;
 import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.database.entities.Room;
-import app.hotel.reportmakers.ReservationReport;
+import app.hotel.dbservices.GuestService;
 import app.hotel.dbservices.ReservationService;
+import app.hotel.dbservices.RoomService;
+import app.hotel.reportmakers.ReservationReport;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -25,7 +27,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.ResourceBundle;
 
-import static app.hotel.controllers.AuxiliaryController.generateError;
+import static app.hotel.controllers.AuxiliaryController.generateAlert;
+
 
 @SuppressWarnings(value = "unchecked")
 
@@ -77,7 +80,9 @@ public class ReservationController implements Initializable, ModifyController {
 
     private Reservation selectedReservation;
 
-    private ObservableList<Reservation> reservations;
+    private ReservationService reservations;
+    private RoomService rooms;
+    private GuestService guests;
 
     @Autowired
     public ReservationController(CurrencyService currencyService, ReservationService reservationService) {
@@ -96,7 +101,7 @@ public class ReservationController implements Initializable, ModifyController {
 
         if (getReservationStartDate().getValue().isAfter(getReservationEndDate().getValue())
                 || getReservationStartDate().getValue().isEqual(getReservationEndDate().getValue())) {
-            generateError("Data rozpoczęcia musi być przed datą zakończenia rezerwacji!");
+            generateAlert("", "Data rozpoczęcia musi być przed datą zakończenia rezerwacji!", Alert.AlertType.ERROR);
             return;
         }
         Reservation reservation = new Reservation();
@@ -183,10 +188,19 @@ public class ReservationController implements Initializable, ModifyController {
     }
 
     public void generateReportButtonFunction() {
-        ReservationReport rr = new ReservationReport(
-                getReservationDateFrom().getValue(),
-                getReservationDateTo().getValue(),
-                reservations);
+        LocalDate dateFrom = getReservationDateFrom().getValue();
+        LocalDate dateTo = getReservationDateTo().getValue();
+
+        if (dateFrom == null && dateTo == null) {
+            generateAlert("", "Jedna z podanych dat nie może być pusta", Alert.AlertType.INFORMATION);
+            return;
+        }
+        if (dateFrom == null)
+            dateFrom = LocalDate.of(1900, 1, 1);
+        if (dateTo == null)
+            dateTo = LocalDate.of(2100, 1, 1);
+
+        ReservationReport rr = new ReservationReport(dateFrom, dateTo, reservations, rooms, guests);
 
         rr.generateReport();
         switchMainWindow();
@@ -221,7 +235,8 @@ public class ReservationController implements Initializable, ModifyController {
         try {
             ArrayList<Object> objectList = (ArrayList<Object>) object;
             ObservableList<Guest> guestList = (ObservableList<Guest>) objectList.get(0);
-            ObservableList<Room> roomList = (ObservableList<Room>) objectList.get(1);
+            ObservableList<Room> roomList = ((ObservableList<Room>) objectList.get(1))
+                    .filtered(x -> !x.getState().equals("niedostępny")); //filtrowanie niedostępnych pokojów
             choiceBoxSetData(guestList, roomList);
         } catch (ClassCastException ignored) {
 
@@ -229,7 +244,10 @@ public class ReservationController implements Initializable, ModifyController {
 
         // generate raport
         try {
-            reservations = (ObservableList<Reservation>) object;
+            ArrayList<Object> objectList = (ArrayList<Object>) object;
+            guests = (GuestService) objectList.get(0);
+            rooms = (RoomService) objectList.get(1);
+            reservations = (ReservationService) objectList.get(2);
         } catch (ClassCastException ignored) {
 
         }
