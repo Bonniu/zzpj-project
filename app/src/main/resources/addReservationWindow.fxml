@@ -13,7 +13,8 @@
         <ChoiceBox fx:id="choiceBoxGuestId" layoutX="150.0" layoutY="36.0" prefHeight="25.0" prefWidth="270.0"/>
         <DatePicker fx:id="reservationStartDate" layoutX="200.0" layoutY="126.0" prefHeight="25.0" prefWidth="220.0"/>
         <DatePicker fx:id="reservationEndDate" layoutX="200.0" layoutY="171.0" prefHeight="25.0" prefWidth="220.0"/>
-        <TextField fx:id="reservationTotalPrice" layoutX="200.0" layoutY="216.0" prefHeight="25.0" prefWidth="220.0"/>
+        <TextField fx:id="reservationTotalPrice" editable="false" layoutX="200.0" layoutY="216.0" prefHeight="25.0"
+                   prefWidth="220.0"/>
 
         <Button defaultButton="true" layoutX="53.0" layoutY="264.0" mnemonicParsing="false" onAction="#addReservation"
                 prefHeight="48.0" prefWidth="135.0" style="-fx-background-color: #3DCC91; -fx-font-size: 11pt;"

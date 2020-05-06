@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.ResourceBundle;
 
 import static app.hotel.controllers.AuxiliaryController.generateAlert;
+import static java.time.temporal.ChronoUnit.DAYS;
 
 
 @SuppressWarnings(value = "unchecked")
@@ -94,7 +95,8 @@ public class ReservationController implements Initializable, ModifyController {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         InitPayForReservationWindow();
-        reservationEndDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
+        if (!url.toString().contains("reservationReportWindow")) // jak nie wciskamy generuj raport to ...
+            reservationEndDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
     }
 
 
@@ -120,16 +122,15 @@ public class ReservationController implements Initializable, ModifyController {
         switchMainWindow();
     }
 
-    private void totalPriceOfReservation()
-    {
+    private void totalPriceOfReservation() {
         Room room = (Room) getChoiceBoxRoomId().getSelectionModel().getSelectedItem();
         LocalDate startDate = LocalDate.parse(getReservationStartDate().getValue().toString());
         LocalDate endDate = LocalDate.parse(getReservationEndDate().getValue().toString());
 
-        Long daysBetween = DAYS.between(startDate,endDate);
+        Long daysBetween = DAYS.between(startDate, endDate);
         Float roomPrice = room.getPrice();
         double totalPrice = daysBetween * roomPrice;
-        totalPrice = Math.round(totalPrice*100.0)/100.0;
+        totalPrice = Math.round(totalPrice * 100.0) / 100.0;
         reservationTotalPrice.setText(String.valueOf(totalPrice));
     }
 
