@@ -30,7 +30,7 @@ public class RoomController implements ModifyController {
         room.setNumber(getRoomNumber().getText());
         room.setCapacity(Integer.parseInt(getRoomCapacity().getText()));
         room.setPrice(Float.parseFloat(getRoomPrice().getText()));
-        room.setState(true);
+        room.setState("dostępny");
 
         roomService.insertRoom(room);
         switchMainWindow();
@@ -40,7 +40,7 @@ public class RoomController implements ModifyController {
         selectedRoom.setNumber(roomNumber.getText());
         selectedRoom.setCapacity(Integer.parseInt(roomCapacity.getText()));
         selectedRoom.setPrice(Float.parseFloat(roomPrice.getText()));
-        selectedRoom.setState(Boolean.parseBoolean(roomState.getText()));
+        selectedRoom.setState(roomState.getText());
 
         roomService.updateRoom(selectedRoom);
         switchMainWindow();

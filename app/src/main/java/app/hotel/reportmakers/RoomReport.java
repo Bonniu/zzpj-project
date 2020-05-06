@@ -1,6 +1,5 @@
 package app.hotel.reportmakers;
 
-import app.database.entities.Reservation;
 import app.database.entities.Room;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
@@ -12,7 +11,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 public class RoomReport {
 
@@ -52,6 +50,7 @@ public class RoomReport {
         addHeading(d);
         addAvailableRooms(d);
         addUnavailableRooms(d);
+        addOccupiedRooms(d);
     }
 
     private void addHeading(Document d) {
@@ -66,7 +65,7 @@ public class RoomReport {
 
     private void addAvailableRooms(Document d) throws DocumentException {
         long availableRooms = rooms.stream()
-                .filter(Room::getState).count();
+                .filter(x -> x.getState().equals("dostępny")).count();
 
         String paragraph = "Wolne pokoje: " + availableRooms;
         d.add(new Paragraph(paragraph, polishFont));
@@ -74,9 +73,17 @@ public class RoomReport {
 
     private void addUnavailableRooms(Document d) throws DocumentException {
         long unavailableRooms = rooms.stream()
-                .filter(x -> !x.getState()).count();
+                .filter(x -> x.getState().equals("niedostępny")).count();
 
         String paragraph = "Niedostępne pokoje: " + unavailableRooms;
+        d.add(new Paragraph(paragraph, polishFont));
+    }
+
+    private void addOccupiedRooms(Document d) throws DocumentException {
+        long unavailableRooms = rooms.stream()
+                .filter(x -> x.getState().equals("zajęty")).count();
+
+        String paragraph = "Zajęte pokoje: " + unavailableRooms;
         d.add(new Paragraph(paragraph, polishFont));
     }
 

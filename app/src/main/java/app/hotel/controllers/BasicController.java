@@ -59,7 +59,7 @@ public class BasicController implements Initializable {
     @FXML
     private TableColumn<Room, Number> roomPurchasePrice;
     @FXML
-    private TableColumn<Room, Boolean> roomState;
+    private TableColumn<Room, String> roomState;
 
     public BasicController(GuestService guestService, ReservationService reservationService, RoomService roomService, UserService userService) {
         this.guestService = guestService;
@@ -221,11 +221,11 @@ public class BasicController implements Initializable {
         refreshAll();
     }
 
-    public void warningRefreshReservations(){
+    public void warningRefreshReservations() {
         List<Reservation> outdatedReservations = reservationService.getOutdatedNoPaidReservation();
-        if(outdatedReservations.size() != 0){
+        if (outdatedReservations.size() != 0) {
             String ids = outdatedReservations.stream().
-                    map( reservation -> reservation.getId() + ",\n")
+                    map(reservation -> reservation.getId() + ",\n")
                     .collect(Collectors.joining(""));
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Attention!");
@@ -235,7 +235,8 @@ public class BasicController implements Initializable {
         }
         refreshReservations();
     }
-    public void refreshReservations(){
+
+    public void refreshReservations() {
         /////////////RESERVATION//////////////////////////
         reservationList.clear();
         reservationList.addAll(reservationService.getAllReservations());
@@ -307,9 +308,10 @@ public class BasicController implements Initializable {
         roomPurchasePrice.setCellValueFactory(roomFloatCellDataFeatures ->
                 new SimpleFloatProperty(roomFloatCellDataFeatures.getValue().getPrice())
         );
-        roomState.setCellValueFactory(roomBooleanCellDataFeatures ->
-                new SimpleBooleanProperty(roomBooleanCellDataFeatures.getValue().getState())
+        roomState.setCellValueFactory(roomStringCellDataFeatures ->
+                new SimpleStringProperty(roomStringCellDataFeatures.getValue().getState())
         );
+
         roomsTable.setItems(roomList);
 
         refreshReservations();
