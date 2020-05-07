@@ -88,6 +88,7 @@ public class ReservationController implements Initializable, ModifyController {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         InitPayForReservationWindow();
         if (!url.toString().contains("reservationReportWindow")) // jak nie wciskamy generuj raport to ...
+            reservationStartDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
             reservationEndDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
     }
 
@@ -115,32 +116,36 @@ public class ReservationController implements Initializable, ModifyController {
     }
 
     private void totalPriceOfReservation() {
-        Room room = (Room) getChoiceBoxRoomId().getSelectionModel().getSelectedItem();
-        LocalDate startDate = LocalDate.parse(reservationStartDate.getValue().toString());
-        LocalDate endDate = LocalDate.parse(getReservationEndDate().getValue().toString());
-
-        Long daysBetween = DAYS.between(startDate, endDate);
-        Float roomPrice = room.getPrice();
-        double totalPrice = daysBetween * roomPrice;
-        totalPrice = Math.round(totalPrice * 100.0) / 100.0;
+        //dziura między wyborem daty a wpisaniem jej do edytora
+        if(reservationStartDate.getEditor().getText().length()>0 || reservationEndDate.getEditor().getText().length()>0){
+            Room room = (Room) getChoiceBoxRoomId().getSelectionModel().getSelectedItem();
+            LocalDate startDate = LocalDate.parse(reservationStartDate.getValue().toString());
+            LocalDate endDate = LocalDate.parse(getReservationEndDate().getValue().toString());
 
 
-        if(!Objects.isNull(selectedReservation))
-        {
+            Long daysBetween = DAYS.between(startDate, endDate);
+            Float roomPrice = room.getPrice();
+            double totalPrice = daysBetween * roomPrice;
+            totalPrice = Math.round(totalPrice * 100.0) / 100.0;
 
-            if(selectedReservation.getTotalPrice() > 0 && selectedReservation.isPayed() && reservationTotalPrice.getText().length() >0) {
-                System.out.println(reservationTotalPrice.getText());
-                double prevPrice = selectedReservation.getTotalPrice();
-                double difference = prevPrice - totalPrice;
-                if(difference > 0){
-                    generateAlert("", "Należy oddać klientowi"+ Math.abs(Math.round(difference * 100.0) / 100.0)+".", Alert.AlertType.INFORMATION);
-                }else if(difference < 0){
-                    generateAlert("", "Klient musi dopłacić "+Math.abs(Math.round(difference * 100.0) / 100.0)+".", Alert.AlertType.INFORMATION);
+
+            if(!Objects.isNull(selectedReservation))
+            {
+                if(selectedReservation.getTotalPrice() > 0 && selectedReservation.isPayed() && reservationTotalPrice.getText().length() >0) {
+                    System.out.println(reservationTotalPrice.getText());
+                    double prevPrice = selectedReservation.getTotalPrice();
+                    double difference = prevPrice - totalPrice;
+                    if(difference > 0){
+                        generateAlert("", "Należy oddać klientowi "+ Math.abs(Math.round(difference * 100.0) / 100.0)+".", Alert.AlertType.INFORMATION);
+                    }else if(difference < 0){
+                        generateAlert("", "Klient musi dopłacić "+Math.abs(Math.round(difference * 100.0) / 100.0)+".", Alert.AlertType.INFORMATION);
+                    }
                 }
             }
+
+            reservationTotalPrice.setText(String.valueOf(totalPrice));
         }
 
-        reservationTotalPrice.setText(String.valueOf(totalPrice));
 
     }
 
