@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 import static app.hotel.controllers.AuxiliaryController.generateAlert;
@@ -122,7 +123,25 @@ public class ReservationController implements Initializable, ModifyController {
         Float roomPrice = room.getPrice();
         double totalPrice = daysBetween * roomPrice;
         totalPrice = Math.round(totalPrice * 100.0) / 100.0;
+
+
+        if(!Objects.isNull(selectedReservation))
+        {
+
+            if(selectedReservation.getTotalPrice() > 0 && selectedReservation.isPayed() && reservationTotalPrice.getText().length() >0) {
+                System.out.println(reservationTotalPrice.getText());
+                double prevPrice = selectedReservation.getTotalPrice();
+                double difference = prevPrice - totalPrice;
+                if(difference > 0){
+                    generateAlert("", "Należy oddać klientowi"+ Math.abs(Math.round(difference * 100.0) / 100.0)+".", Alert.AlertType.INFORMATION);
+                }else if(difference < 0){
+                    generateAlert("", "Klient musi dopłacić "+Math.abs(Math.round(difference * 100.0) / 100.0)+".", Alert.AlertType.INFORMATION);
+                }
+            }
+        }
+
         reservationTotalPrice.setText(String.valueOf(totalPrice));
+
     }
 
     public void modifyReservation() throws ParseException {
