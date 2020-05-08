@@ -1,4 +1,4 @@
-package app.hotel.dbservices;
+package app.hotel.dbservices.implementation;
 
 import app.database.entities.Room;
 import app.database.repositories.RoomRepository;

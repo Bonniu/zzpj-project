@@ -1,7 +1,7 @@
 package app.hotel.controllers;
 
 import app.database.entities.Guest;
-import app.hotel.dbservices.GuestService;
+import app.hotel.dbservices.implementation.GuestService;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import lombok.Getter;
