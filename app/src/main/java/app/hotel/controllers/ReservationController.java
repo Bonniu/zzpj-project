@@ -87,9 +87,11 @@ public class ReservationController implements Initializable, ModifyController {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         InitPayForReservationWindow();
-        if (!url.toString().contains("reservationReportWindow")) // jak nie wciskamy generuj raport to ...
+        // jak nie wciskamy generuj raport to ...
+        if (!url.toString().contains("reservationReportWindow") && !url.toString().contains("addPayWindow")) {
             reservationStartDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
             reservationEndDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
+        }
     }
 
 
@@ -117,7 +119,7 @@ public class ReservationController implements Initializable, ModifyController {
 
     private void totalPriceOfReservation() {
         //dziura między wyborem daty a wpisaniem jej do edytora
-        if(reservationStartDate.getEditor().getText().length()>0 || reservationEndDate.getEditor().getText().length()>0){
+        if (reservationStartDate.getEditor().getText().length() > 0 || reservationEndDate.getEditor().getText().length() > 0) {
             Room room = (Room) getChoiceBoxRoomId().getSelectionModel().getSelectedItem();
             LocalDate startDate = LocalDate.parse(reservationStartDate.getValue().toString());
             LocalDate endDate = LocalDate.parse(getReservationEndDate().getValue().toString());
@@ -129,16 +131,15 @@ public class ReservationController implements Initializable, ModifyController {
             totalPrice = Math.round(totalPrice * 100.0) / 100.0;
 
 
-            if(!Objects.isNull(selectedReservation))
-            {
-                if(selectedReservation.getTotalPrice() > 0 && selectedReservation.isPayed() && reservationTotalPrice.getText().length() >0) {
+            if (!Objects.isNull(selectedReservation)) {
+                if (selectedReservation.getTotalPrice() > 0 && selectedReservation.isPayed() && reservationTotalPrice.getText().length() > 0) {
                     System.out.println(reservationTotalPrice.getText());
                     double prevPrice = selectedReservation.getTotalPrice();
                     double difference = prevPrice - totalPrice;
-                    if(difference > 0){
-                        generateAlert("", "Należy oddać klientowi "+ Math.abs(Math.round(difference * 100.0) / 100.0)+".", Alert.AlertType.INFORMATION);
-                    }else if(difference < 0){
-                        generateAlert("", "Klient musi dopłacić "+Math.abs(Math.round(difference * 100.0) / 100.0)+".", Alert.AlertType.INFORMATION);
+                    if (difference > 0) {
+                        generateAlert("", "Należy oddać klientowi " + Math.abs(Math.round(difference * 100.0) / 100.0) + ".", Alert.AlertType.INFORMATION);
+                    } else if (difference < 0) {
+                        generateAlert("", "Klient musi dopłacić " + Math.abs(Math.round(difference * 100.0) / 100.0) + ".", Alert.AlertType.INFORMATION);
                     }
                 }
             }
@@ -257,8 +258,8 @@ public class ReservationController implements Initializable, ModifyController {
 
             int i = 0;
             int guestIndex = 0;
-            for (Guest guest: guestList) {
-                if(guest.getPidn().equals(selectedReservation.getGuestId())){
+            for (Guest guest : guestList) {
+                if (guest.getPidn().equals(selectedReservation.getGuestId())) {
                     guestIndex = i;
                 }
                 i++;
@@ -266,14 +267,14 @@ public class ReservationController implements Initializable, ModifyController {
             i = 0;
 
             int roomIndex = 0;
-            for (Room room: roomList) {
-                if(room.getNumber().equals(selectedReservation.getRoomId())){
+            for (Room room : roomList) {
+                if (room.getNumber().equals(selectedReservation.getRoomId())) {
                     roomIndex = i;
                 }
                 i++;
             }
 
-            
+
             choiceBoxSetData(guestList, roomList);
             modifyReservationSetData(guestIndex, roomIndex);
         } catch (ClassCastException ignored) {
