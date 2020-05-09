@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface GuestRepository extends MongoRepository<Guest, String> {
+public interface GuestRepository extends MongoRepository<Guest, Long> {
     List<Guest> findByName(String name);
 }

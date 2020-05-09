@@ -8,10 +8,7 @@ import app.hotel.dbservices.GuestService;
 import app.hotel.dbservices.ReservationService;
 import app.hotel.dbservices.RoomService;
 import app.hotel.reportmakers.RoomReport;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleFloatProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -208,7 +205,7 @@ public class BasicController implements Initializable {
                 new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getId())
         );
         guestID.setCellValueFactory(reservationStringCellDataFeatures ->
-                new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getGuestId())
+                new SimpleStringProperty(Long.toString(reservationStringCellDataFeatures.getValue().getGuestId()))
         );
         roomID.setCellValueFactory(reservationStringCellDataFeatures ->
                 new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getRoomId())
@@ -235,8 +232,8 @@ public class BasicController implements Initializable {
         guestList.clear();
         guestList.addAll(guestService.getAllGuests());
 
-        guestId.setCellValueFactory(guestStringCellDataFeatures ->
-                new SimpleStringProperty(guestStringCellDataFeatures.getValue().getPidn())
+        guestId.setCellValueFactory(guestLongCellDataFeatures ->
+                new SimpleStringProperty(Long.toString(guestLongCellDataFeatures.getValue().getPesel()))
         );
 
         guestName.setCellValueFactory(guestStringCellDataFeatures ->

@@ -8,20 +8,24 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import java.util.Objects;
-
 @Getter
 @Controller
-public class GuestController implements ModifyController{
+public class GuestController implements ModifyController {
+    @FXML
+    public TextField guestPesel;
+
+    @FXML
+    private TextField guestName;
+
+    @FXML
+    private TextField guestSurname;
+
+    @FXML
+    private TextField guestPhonenumber;
 
     @FXML
     public TextField guestDiscount;
-    @FXML
-    private TextField guestName;
-    @FXML
-    private TextField guestSurname;
-    @FXML
-    private TextField guestPhonenumber;
+
 
     private Guest selectedGuest;
     //DB
@@ -30,20 +34,25 @@ public class GuestController implements ModifyController{
 
     public void addGuest() {
         Guest guest = new Guest();
+        if (getGuestPesel().getText().length() < 11)
+            return;
+        long pesel;
+        try {
+            pesel = Long.parseLong(getGuestPesel().getText());
+        } catch (NumberFormatException e) {
+            return;
+        }
+        guest.setPesel(pesel);
         guest.setName(getGuestName().getText());
         guest.setSurname(getGuestSurname().getText());
         guest.setPhoneNumber(Integer.parseInt(getGuestPhonenumber().getText()));
         guest.setDiscount(Integer.parseInt(getGuestDiscount().getText()));
-        System.out.println(Objects.isNull(guestService));
-
         guestService.insertGuest(guest);
         switchMainWindow();
     }
 
-    public void initData(Object object)
-    {
-        Guest guest = (Guest)object;
-        selectedGuest = guest;
+    public void initData(Object object) {
+        selectedGuest = (Guest) object;
         guestName.setText(selectedGuest.getName());
         guestSurname.setText(selectedGuest.getSurname());
         guestPhonenumber.setText(String.valueOf(selectedGuest.getPhoneNumber()));
@@ -57,7 +66,7 @@ public class GuestController implements ModifyController{
         selectedGuest.setPhoneNumber(Integer.parseInt(guestPhonenumber.getText()));
         selectedGuest.setDiscount(0);
         //TODO
-       // selectedGuest.setDiscount(Integer.parseInt(getGuestDiscount().getText()));
+        // selectedGuest.setDiscount(Integer.parseInt(getGuestDiscount().getText()));
         guestService.updateGuest(selectedGuest);
 
         switchMainWindow();

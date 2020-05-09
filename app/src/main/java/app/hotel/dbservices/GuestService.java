@@ -21,7 +21,7 @@ public class GuestService {
         return guestRepository.findAll();
     }
 
-    public Optional<Guest> getGuestById(String id) {
+    public Optional<Guest> getGuestById(long id) {
         return this.guestRepository.findById(id);
     }
 

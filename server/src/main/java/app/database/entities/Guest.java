@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Guest{
 
     @Id
-    private String pidn;
+    private long pesel;
     private String name;
     private String surname;
     private int phoneNumber;
