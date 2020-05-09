@@ -138,6 +138,7 @@ public class BasicController implements Initializable {
     }
 
     public void deleteGuest() {
+        System.out.println(getSelectedGuest());
         guestService.deleteGuest(getSelectedGuest());
         refreshAll();
     }
@@ -177,6 +178,7 @@ public class BasicController implements Initializable {
     }
 
     public void paidWindow() {
+        Reservation r = getSelectedReservation();
         URL addPayWindowLocation = Main.class.getResource("/" + "addPayWindow.fxml");
         changeScene(addPayWindowLocation, 460, 360);
     }
@@ -205,7 +207,7 @@ public class BasicController implements Initializable {
                 new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getId())
         );
         guestID.setCellValueFactory(reservationStringCellDataFeatures ->
-                new SimpleStringProperty(Long.toString(reservationStringCellDataFeatures.getValue().getGuestId()))
+                new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getGuestId())
         );
         roomID.setCellValueFactory(reservationStringCellDataFeatures ->
                 new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getRoomId())
@@ -232,8 +234,8 @@ public class BasicController implements Initializable {
         guestList.clear();
         guestList.addAll(guestService.getAllGuests());
 
-        guestId.setCellValueFactory(guestLongCellDataFeatures ->
-                new SimpleStringProperty(Long.toString(guestLongCellDataFeatures.getValue().getPesel()))
+        guestId.setCellValueFactory(guestStringCellDataFeatures ->
+                new SimpleStringProperty(guestStringCellDataFeatures.getValue().getPesel())
         );
 
         guestName.setCellValueFactory(guestStringCellDataFeatures ->

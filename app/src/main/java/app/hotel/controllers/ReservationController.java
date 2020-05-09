@@ -259,7 +259,7 @@ public class ReservationController implements Initializable, ModifyController {
             int i = 0;
             int guestIndex = 0;
             for (Guest guest : guestList) {
-                if (Long.toString(guest.getPesel()).equals(selectedReservation.getGuestId())) {
+                if (guest.getPesel().equals(selectedReservation.getGuestId())) {
                     guestIndex = i;
                 }
                 i++;

@@ -1,6 +1,8 @@
 package app.database.entities;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -8,10 +10,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Guest{
+public class Guest {
 
     @Id
-    private long pesel;
+    private String pesel;
     private String name;
     private String surname;
     private int phoneNumber;

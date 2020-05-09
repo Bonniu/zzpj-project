@@ -1,7 +1,6 @@
 package app.database.api;
 
 import app.database.api.strategy.Exchange;
-import app.database.api.strategy.StrategyName;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +13,7 @@ public class StrategyContext {
     public StrategyContext(Set<Exchange> strategySet) {
         strategies = new HashMap<String, Exchange>();
         strategySet.forEach(
-                strategy ->strategies.put(strategy.getStrategyName(), strategy));
+                strategy -> strategies.put(strategy.getStrategyName(), strategy));
     }
 
     public Exchange findStrategy(String strategyName) {

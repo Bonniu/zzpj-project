@@ -3,10 +3,13 @@ package app.hotel.controllers;
 import app.database.entities.Guest;
 import app.hotel.dbservices.GuestService;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+
+import static app.hotel.controllers.AuxiliaryController.generateAlert;
 
 @Getter
 @Controller
@@ -34,15 +37,21 @@ public class GuestController implements ModifyController {
 
     public void addGuest() {
         Guest guest = new Guest();
-        if (getGuestPesel().getText().length() < 11)
-            return;
-        long pesel;
-        try {
-            pesel = Long.parseLong(getGuestPesel().getText());
-        } catch (NumberFormatException e) {
+        if (getGuestPesel().getText().length() != 11) {
+            generateAlert("Gość nie został dodany do bazy danych.",
+                    "PESEL nie ma 11 znaków.",
+                    Alert.AlertType.ERROR);
             return;
         }
-        guest.setPesel(pesel);
+        try {
+            Long.parseLong(getGuestPesel().getText());
+        } catch (NumberFormatException e) {
+            generateAlert("Gość nie został dodany do bazy danych.",
+                    "PESEL jest nieprawidłowy.",
+                    Alert.AlertType.ERROR);
+            return;
+        }
+        guest.setPesel(getGuestPesel().getText());
         guest.setName(getGuestName().getText());
         guest.setSurname(getGuestSurname().getText());
         guest.setPhoneNumber(Integer.parseInt(getGuestPhonenumber().getText()));

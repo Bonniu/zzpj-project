@@ -13,7 +13,7 @@
         <TextField fx:id="guestName" layoutX="201.0" layoutY="85.0" prefHeight="25.0" prefWidth="160.0"/>
         <TextField fx:id="guestSurname" layoutX="201.0" layoutY="125.0" prefHeight="25.0" prefWidth="160.0"/>
         <TextField fx:id="guestPhonenumber" layoutX="201.0" layoutY="165.0" prefHeight="25.0" prefWidth="160.0"/>
-        <TextField fx:id="guestDiscount" layoutX="201.0" layoutY="205.0" prefHeight="25.0" prefWidth="160.0"/>
+        <TextField fx:id="guestDiscount" layoutX="201.0" layoutY="205.0" prefHeight="25.0" prefWidth="160.0" text="0"/>
         <Button defaultButton="true" layoutX="53.0" layoutY="264.0" mnemonicParsing="false" onAction="#addGuest"
                 prefHeight="48.0" prefWidth="135.0" style="-fx-background-color: #3DCC91; -fx-font-size: 11pt;"
                 text="Zatwierdź"/>
