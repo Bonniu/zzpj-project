@@ -99,15 +99,43 @@ public class ReservationReport {
     }
 
     private void addUnfinishedReservations(Document d) throws DocumentException {
+        ArrayList<Reservation> notFinished = reservations.stream()
+                .filter(x -> x.getEndDate().isAfter(LocalDate.now()))
+                .collect(Collectors.toCollection(ArrayList::new));
 
+
+        String paragraph = "Rezerwacje niezakończone - " + notFinished.size();
+        if (notFinished.size() != 0)
+            paragraph += ": ";
+        d.add(new Paragraph(paragraph, polishFont16));
+
+        addReservationList(d, notFinished);
     }
 
     private void addFinishedReservations(Document d) throws DocumentException {
+        ArrayList<Reservation> finished = reservations.stream()
+                .filter(x -> !x.getEndDate().isAfter(LocalDate.now()))
+                .collect(Collectors.toCollection(ArrayList::new));
 
+        String paragraph = "Rezerwacje zakończone - " + finished.size();
+        if (finished.size() != 0)
+            paragraph += ": ";
+        d.add(new Paragraph(paragraph, polishFont16));
+
+        addReservationList(d, finished);
     }
 
     private void addNotPaidReservations(Document d) throws DocumentException {
+        ArrayList<Reservation> notPaid = reservations.stream()
+                .filter(x -> !x.isPayed())
+                .collect(Collectors.toCollection(ArrayList::new));
 
+        String paragraph = "Rezerwacje nieopłacone - " + notPaid.size();
+        if (notPaid.size() != 0)
+            paragraph += ": ";
+        d.add(new Paragraph(paragraph, polishFont16));
+
+        addReservationList(d, notPaid);
     }
 
     private void addPaidReservations(Document d) throws DocumentException {
