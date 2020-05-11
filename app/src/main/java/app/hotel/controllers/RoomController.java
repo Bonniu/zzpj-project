@@ -1,7 +1,7 @@
 package app.hotel.controllers;
 
 import app.database.entities.Room;
-import app.hotel.dbservices.RoomService;
+import app.hotel.dbservices.implementation.RoomService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
@@ -34,7 +34,7 @@ public class RoomController implements ModifyController {
         room.setPrice(Float.parseFloat(getRoomPrice().getText()));
         room.setState("dostępny");
 
-        roomService.insertRoom(room);
+        roomService.insert(room);
         switchMainWindow();
     }
 
@@ -44,7 +44,7 @@ public class RoomController implements ModifyController {
         selectedRoom.setPrice(Float.parseFloat(roomPrice.getText()));
         selectedRoom.setState((String) roomStateChoiceBox.getSelectionModel().getSelectedItem());
 
-        roomService.updateRoom(selectedRoom);
+        roomService.update(selectedRoom);
         switchMainWindow();
 
     }

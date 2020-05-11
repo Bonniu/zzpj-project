@@ -4,9 +4,9 @@ import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.database.entities.Room;
 import app.hotel.Main;
-import app.hotel.dbservices.GuestService;
-import app.hotel.dbservices.ReservationService;
-import app.hotel.dbservices.RoomService;
+import app.hotel.dbservices.implementation.GuestService;
+import app.hotel.dbservices.implementation.ReservationService;
+import app.hotel.dbservices.implementation.RoomService;
 import app.hotel.reportmakers.RoomReport;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -115,7 +115,7 @@ public class BasicController implements Initializable {
     }
 
     public void deleteRoom() {
-        roomService.deleteRoom(getSelectedRoom());
+        roomService.delete(getSelectedRoom());
         refreshAll();
     }
 
@@ -139,7 +139,8 @@ public class BasicController implements Initializable {
 
     public void deleteGuest() {
         System.out.println(getSelectedGuest());
-        guestService.deleteGuest(getSelectedGuest());
+        guestService.delete(getSelectedGuest());
+
         refreshAll();
     }
 
@@ -164,7 +165,7 @@ public class BasicController implements Initializable {
     }
 
     public void deleteReservation() {
-        reservationService.deleteReservation(getSelectedReservation());
+        reservationService.delete(getSelectedReservation());
         refreshAll();
     }
 
@@ -200,7 +201,7 @@ public class BasicController implements Initializable {
     public void refreshReservations() {
         /////////////RESERVATION//////////////////////////
         reservationList.clear();
-        reservationList.addAll(reservationService.getAllReservations());
+        reservationList.addAll(reservationService.findAll());
 
 
         reservationId.setCellValueFactory(reservationStringCellDataFeatures ->
@@ -232,7 +233,7 @@ public class BasicController implements Initializable {
 
         //////////////GUEST/////////////////////////
         guestList.clear();
-        guestList.addAll(guestService.getAllGuests());
+        guestList.addAll(guestService.findAll());
 
         guestId.setCellValueFactory(guestStringCellDataFeatures ->
                 new SimpleStringProperty(guestStringCellDataFeatures.getValue().getPesel())
@@ -257,7 +258,7 @@ public class BasicController implements Initializable {
 
         /////////////ROOM//////////////////////////
         roomList.clear();
-        roomList.addAll(roomService.getAllRooms());
+        roomList.addAll(roomService.findAll());
 
         roomNumber.setCellValueFactory(roomStringCellDataFeatures ->
                 new SimpleStringProperty(roomStringCellDataFeatures.getValue().getNumber())

@@ -3,9 +3,9 @@ package app.hotel.reportmakers;
 import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.database.entities.Room;
-import app.hotel.dbservices.GuestService;
-import app.hotel.dbservices.ReservationService;
-import app.hotel.dbservices.RoomService;
+import app.hotel.dbservices.implementation.GuestService;
+import app.hotel.dbservices.implementation.ReservationService;
+import app.hotel.dbservices.implementation.RoomService;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -35,7 +35,7 @@ public class ReservationReport {
         this.reportDateTo = reportDateTo;
         this.rooms = rooms;
         this.guests = guests;
-        this.reservations = reservations.getAllReservations().stream()
+        this.reservations = reservations.findAll().stream()
                 .filter(x -> !reportDateFrom.isAfter(x.getStartDate()))
                 .filter(x -> !reportDateTo.isBefore(x.getEndDate()))
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -161,11 +161,11 @@ public class ReservationReport {
 
     private String generateReservationEntry(Reservation reservation) {
         Guest guest = new Guest();
-        if (guests.getGuestById(reservation.getGuestId()).isPresent())
-            guest = guests.getGuestById(reservation.getGuestId()).get();
+        if (guests.find(reservation.getGuestId()).isPresent())
+            guest = guests.find(reservation.getGuestId()).get();
         Room room = new Room();
-        if (rooms.getRoomById(reservation.getRoomId()).isPresent())
-            room = rooms.getRoomById(reservation.getRoomId()).get();
+        if (rooms.find(reservation.getRoomId()).isPresent())
+            room = rooms.find(reservation.getRoomId()).get();
 
         return reservation.getId() +
                 " (" +

@@ -1,7 +1,7 @@
 package app.hotel.controllers;
 
 import app.database.entities.Guest;
-import app.hotel.dbservices.GuestService;
+import app.hotel.dbservices.implementation.GuestService;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
@@ -56,7 +56,9 @@ public class GuestController implements ModifyController {
         guest.setSurname(getGuestSurname().getText());
         guest.setPhoneNumber(Integer.parseInt(getGuestPhonenumber().getText()));
         guest.setDiscount(Integer.parseInt(getGuestDiscount().getText()));
-        guestService.insertGuest(guest);
+      
+        guestService.insert(guest);
+
         switchMainWindow();
     }
 
@@ -75,9 +77,8 @@ public class GuestController implements ModifyController {
         selectedGuest.setPhoneNumber(Integer.parseInt(guestPhonenumber.getText()));
         selectedGuest.setDiscount(0);
         //TODO
-        // selectedGuest.setDiscount(Integer.parseInt(getGuestDiscount().getText()));
-        guestService.updateGuest(selectedGuest);
-
+       // selectedGuest.setDiscount(Integer.parseInt(getGuestDiscount().getText()));
+        guestService.update(selectedGuest);
         switchMainWindow();
     }
 

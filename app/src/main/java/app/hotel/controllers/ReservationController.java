@@ -4,9 +4,9 @@ import app.database.api.CurrencyService;
 import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.database.entities.Room;
-import app.hotel.dbservices.GuestService;
-import app.hotel.dbservices.ReservationService;
-import app.hotel.dbservices.RoomService;
+import app.hotel.dbservices.implementation.GuestService;
+import app.hotel.dbservices.implementation.ReservationService;
+import app.hotel.dbservices.implementation.RoomService;
 import app.hotel.reportmakers.ReservationReport;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -113,7 +113,7 @@ public class ReservationController implements Initializable, ModifyController {
         reservation.setTotalPrice(Float.parseFloat(getReservationTotalPrice().getText()));
         reservation.setPayed(false);
 
-        reservationService.insertReservation(reservation);
+        reservationService.insert(reservation);
         switchMainWindow();
     }
 
@@ -180,7 +180,7 @@ public class ReservationController implements Initializable, ModifyController {
         selectedReservation.setTotalPrice(Float.parseFloat(reservationTotalPrice.getText()));
         selectedReservation.setPayed(Boolean.parseBoolean(reservationIdPayed.getText()));
 
-        reservationService.updateReservation(selectedReservation);
+        reservationService.update(selectedReservation);
         switchMainWindow();
     }
 
