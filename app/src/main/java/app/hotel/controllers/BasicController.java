@@ -8,10 +8,7 @@ import app.hotel.dbservices.implementation.GuestService;
 import app.hotel.dbservices.implementation.ReservationService;
 import app.hotel.dbservices.implementation.RoomService;
 import app.hotel.reportmakers.RoomReport;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleFloatProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -141,7 +138,9 @@ public class BasicController implements Initializable {
     }
 
     public void deleteGuest() {
+        System.out.println(getSelectedGuest());
         guestService.delete(getSelectedGuest());
+
         refreshAll();
     }
 
@@ -180,6 +179,7 @@ public class BasicController implements Initializable {
     }
 
     public void paidWindow() {
+        Reservation r = getSelectedReservation();
         URL addPayWindowLocation = Main.class.getResource("/" + "addPayWindow.fxml");
         changeScene(addPayWindowLocation, 460, 360);
     }
@@ -236,7 +236,7 @@ public class BasicController implements Initializable {
         guestList.addAll(guestService.findAll());
 
         guestId.setCellValueFactory(guestStringCellDataFeatures ->
-                new SimpleStringProperty(guestStringCellDataFeatures.getValue().getPidn())
+                new SimpleStringProperty(guestStringCellDataFeatures.getValue().getPesel())
         );
 
         guestName.setCellValueFactory(guestStringCellDataFeatures ->

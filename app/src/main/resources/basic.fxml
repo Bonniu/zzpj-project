@@ -50,11 +50,11 @@
                                     <columns>
                                         <TableColumn fx:id="roomNumber" minWidth="40.0" prefWidth="100.0"
                                                      resizable="false" text="Numer pokoju"/>
-                                        <TableColumn fx:id="roomCapacity" minWidth="40.0" prefWidth="100.0"
+                                        <TableColumn fx:id="roomCapacity" minWidth="40.0" prefWidth="159.0"
                                                      resizable="false" text="Pojemność"/>
-                                        <TableColumn fx:id="roomPurchasePrice" minWidth="40.0" prefWidth="150.0"
+                                        <TableColumn fx:id="roomPurchasePrice" minWidth="40.0" prefWidth="175.0"
                                                      resizable="false" text="Cena pokoju (za dzień)"/>
-                                        <TableColumn fx:id="roomState" minWidth="40.0" prefWidth="200.0"
+                                        <TableColumn fx:id="roomState" minWidth="40.0" prefWidth="265.0"
                                                      resizable="false" text="Stan"/>
                                     </columns>
                                 </TableView>
@@ -69,8 +69,8 @@
                                 <TableView fx:id="guestsTable" layoutX="15.0" layoutY="15.0" prefHeight="660.0"
                                            prefWidth="700.0">
                                     <columns>
-                                        <TableColumn fx:id="guestId" prefWidth="200.0" resizable="false" text="ID"/>
-                                        <TableColumn fx:id="guestName" prefWidth="130.0" resizable="false" text="Imię"/>
+                                        <TableColumn fx:id="guestId" prefWidth="141.0" resizable="false" text="PESEL"/>
+                                        <TableColumn fx:id="guestName" prefWidth="189.0" resizable="false" text="Imię"/>
                                         <TableColumn fx:id="guestSurname" prefWidth="150.0" resizable="false"
                                                      text="Nazwisko"/>
                                         <TableColumn fx:id="guestPhonenumber" prefWidth="120.0" resizable="false"
@@ -104,18 +104,19 @@
                                 <TableView fx:id="reservationsTable" layoutX="15.0" layoutY="15.0" prefHeight="660.0"
                                            prefWidth="700.0">
                                     <columns>
-                                        <TableColumn fx:id="reservationId" prefWidth="153" resizable="false" text="ID"/>
-                                        <TableColumn fx:id="guestID" prefWidth="97.99999237060547" resizable="false"
-                                                     text="ID gościa"/>
-                                        <TableColumn fx:id="roomID" prefWidth="91.79998779296875" resizable="false"
-                                                     text="ID pokoju"/>
-                                        <TableColumn fx:id="startDate" prefWidth="85" resizable="false"
+                                        <TableColumn fx:id="reservationId" prefWidth="170.0" resizable="false"
+                                                     text="ID"/>
+                                        <TableColumn fx:id="guestID" prefWidth="90.0" resizable="false" text="PESEL"/>
+                                        <TableColumn fx:id="roomID" prefWidth="80.0" resizable="false"
+                                                     text="nr pokoju"/>
+                                        <TableColumn fx:id="startDate" prefWidth="80.0" resizable="false"
                                                      text="Data rozp."/>
-                                        <TableColumn fx:id="endDate" prefWidth="85" resizable="false" text="Data zak."/>
-                                        <TableColumn fx:id="totalPrice" minWidth="0.0" prefWidth="102.0"
-                                                     resizable="false" text="Cena całkowita"/>
-                                        <TableColumn fx:id="isPayed" minWidth="0.0" prefWidth="86.4000244140625"
-                                                     resizable="false" text="Czy opłacone"/>
+                                        <TableColumn fx:id="endDate" prefWidth="80.0" resizable="false"
+                                                     text="Data zak."/>
+                                        <TableColumn fx:id="totalPrice" prefWidth="100.0" resizable="false"
+                                                     text="Cena całkowita"/>
+                                        <TableColumn fx:id="isPayed" prefWidth="100.0" resizable="false"
+                                                     text="Czy opłacone"/>
                                     </columns>
                                 </TableView>
                                 <Button layoutX="735.0" layoutY="15.0" mnemonicParsing="false"
