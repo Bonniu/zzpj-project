@@ -118,7 +118,7 @@ public class BasicController implements Initializable {
     }
 
     public void deleteRoom() {
-        roomService.deleteRoom(getSelectedRoom());
+        roomService.delete(getSelectedRoom());
         refreshAll();
     }
 
@@ -141,7 +141,7 @@ public class BasicController implements Initializable {
     }
 
     public void deleteGuest() {
-        guestService.deleteGuest(getSelectedGuest());
+        guestService.delete(getSelectedGuest());
         refreshAll();
     }
 
@@ -166,7 +166,7 @@ public class BasicController implements Initializable {
     }
 
     public void deleteReservation() {
-        reservationService.deleteReservation(getSelectedReservation());
+        reservationService.delete(getSelectedReservation());
         refreshAll();
     }
 
@@ -201,7 +201,7 @@ public class BasicController implements Initializable {
     public void refreshReservations() {
         /////////////RESERVATION//////////////////////////
         reservationList.clear();
-        reservationList.addAll(reservationService.getAllReservations());
+        reservationList.addAll(reservationService.findAll());
 
 
         reservationId.setCellValueFactory(reservationStringCellDataFeatures ->
@@ -233,7 +233,7 @@ public class BasicController implements Initializable {
 
         //////////////GUEST/////////////////////////
         guestList.clear();
-        guestList.addAll(guestService.getAllGuests());
+        guestList.addAll(guestService.findAll());
 
         guestId.setCellValueFactory(guestStringCellDataFeatures ->
                 new SimpleStringProperty(guestStringCellDataFeatures.getValue().getPidn())
@@ -258,7 +258,7 @@ public class BasicController implements Initializable {
 
         /////////////ROOM//////////////////////////
         roomList.clear();
-        roomList.addAll(roomService.getAllRooms());
+        roomList.addAll(roomService.findAll());
 
         roomNumber.setCellValueFactory(roomStringCellDataFeatures ->
                 new SimpleStringProperty(roomStringCellDataFeatures.getValue().getNumber())

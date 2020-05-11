@@ -36,7 +36,7 @@ public class GuestController implements ModifyController{
         guest.setDiscount(Integer.parseInt(getGuestDiscount().getText()));
         System.out.println(Objects.isNull(guestService));
 
-        guestService.insertGuest(guest);
+        guestService.insert(guest);
         switchMainWindow();
     }
 
@@ -58,7 +58,7 @@ public class GuestController implements ModifyController{
         selectedGuest.setDiscount(0);
         //TODO
        // selectedGuest.setDiscount(Integer.parseInt(getGuestDiscount().getText()));
-        guestService.updateGuest(selectedGuest);
+        guestService.update(selectedGuest);
 
         switchMainWindow();
     }

@@ -2,6 +2,7 @@ package app.hotel.dbservices.implementation;
 
 import app.database.entities.Room;
 import app.database.repositories.RoomRepository;
+import app.hotel.dbservices.RoomServiceInterface;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,33 +10,37 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class RoomService {
+public class RoomService implements RoomServiceInterface {
     private RoomRepository roomRepository;
 
     public RoomService(RoomRepository roomRepository) {
         this.roomRepository = roomRepository;
     }
 
-    public List<Room> getAllRooms() {
-        List<Room> rooms = this.roomRepository.findAll();
-        return rooms;
-    }
-
-    public Optional<Room> getRoomById(String id) {
+    @Override
+    public Optional<Room> find(String id) {
         Optional<Room> room = this.roomRepository.findById(id);
         return room;
     }
 
-    public void insertRoom(@RequestBody Room room) {
-        this.roomRepository.insert(room);
+    @Override
+    public List<Room> findAll() {
+        List<Room> rooms = this.roomRepository.findAll();
+        return rooms;
     }
 
-    public void updateRoom(@RequestBody Room room) {
-        this.roomRepository.save(room);
+    @Override
+    public void insert(@RequestBody Room entity) {
+        this.roomRepository.insert(entity);
     }
 
-    public void deleteRoom(@RequestBody Room room) {
-        this.roomRepository.delete(room);
+    @Override
+    public void update(@RequestBody Room entity) {
+        this.roomRepository.save(entity);
     }
 
+    @Override
+    public void delete(@RequestBody Room entity) {
+        this.roomRepository.delete(entity);
+    }
 }

@@ -34,7 +34,7 @@ public class RoomController implements ModifyController {
         room.setPrice(Float.parseFloat(getRoomPrice().getText()));
         room.setState("dostępny");
 
-        roomService.insertRoom(room);
+        roomService.insert(room);
         switchMainWindow();
     }
 
@@ -44,7 +44,7 @@ public class RoomController implements ModifyController {
         selectedRoom.setPrice(Float.parseFloat(roomPrice.getText()));
         selectedRoom.setState((String) roomStateChoiceBox.getSelectionModel().getSelectedItem());
 
-        roomService.updateRoom(selectedRoom);
+        roomService.update(selectedRoom);
         switchMainWindow();
 
     }
