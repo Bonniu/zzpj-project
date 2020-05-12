@@ -1,10 +1,6 @@
 package app.hotel;
 
-import app.database.entities.Guest;
-import app.hotel.controllers.BasicController;
-import app.hotel.controllers.GuestController;
-import app.hotel.controllers.ModifyController;
-import com.sun.java.accessibility.util.GUIInitializedListener;
+import app.hotel.controllers.InitializeController;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -14,7 +10,6 @@ import javafx.stage.Stage;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.web.servlet.mvc.Controller;
 
 import java.io.IOException;
 import java.net.URL;
@@ -71,7 +66,7 @@ public class Main extends Application {
         Parent parent = fxmlLoader.load();
         mainStage.setScene(new Scene(parent, width, height));
 
-        ModifyController controller = fxmlLoader.getController();
+        InitializeController controller = fxmlLoader.getController();
         controller.initData(object);
     }
 

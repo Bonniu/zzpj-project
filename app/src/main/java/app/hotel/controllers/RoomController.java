@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 
 @Getter
 @Controller
-public class RoomController implements ModifyController {
+public class RoomController implements InitializeController {
     @FXML
     private TextField roomNumber;
     @FXML

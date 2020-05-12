@@ -1,5 +1,5 @@
 package app.hotel.controllers;
 
-public interface ModifyController {
+public interface InitializeController {
     public void initData(Object object);
 }

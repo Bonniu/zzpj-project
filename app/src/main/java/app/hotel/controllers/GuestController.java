@@ -13,7 +13,7 @@ import static app.hotel.controllers.AuxiliaryController.generateAlert;
 
 @Getter
 @Controller
-public class GuestController implements ModifyController {
+public class GuestController implements InitializeController {
     @FXML
     public TextField guestPesel;
 
