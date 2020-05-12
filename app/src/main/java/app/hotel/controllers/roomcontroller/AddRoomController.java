@@ -37,26 +37,7 @@ public class AddRoomController  {
     }
 
     public void addRoom() {
-        try {
-            validator.validateInsert(new HashMap<>() {{
-                put("capacity", getRoomCapacity().getText());
-                put("price", getRoomPrice().getText());
-            }});
-        }
-        catch (HotelException hotelException){
-            generateAlert("Pokoj nie został dodany!",
-                    hotelException.displayErrors(),
-                    Alert.AlertType.ERROR);
-            return;
-        }
-        Room room = new Room();
-        room.setNumber(getRoomNumber().getText());
-        room.setCapacity(Integer.parseInt(getRoomCapacity().getText()));
-        room.setPrice(Float.parseFloat(getRoomPrice().getText()));
-        room.setState("dostępny");
 
-        roomService.insert(room);
-        switchMainWindow();
     }
 
     public void switchMainWindow() {
