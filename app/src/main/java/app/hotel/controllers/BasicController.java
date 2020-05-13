@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -110,13 +111,21 @@ public class BasicController implements Initializable {
     }
 
     public void switchModifyRoomWindow() {
-        URL modifyRoomWindowLocation = Main.class.getResource("/" + "modifyRoomWindow.fxml");
-        changeScene(modifyRoomWindowLocation, 460, 360, getSelectedRoom());
+        if(Objects.isNull(getSelectedRoom())){
+            generateAlert("", "Należy wybrać pokój, który chcemy zmodyfikować.", Alert.AlertType.ERROR);
+        }else {
+            URL modifyRoomWindowLocation = Main.class.getResource("/" + "modifyRoomWindow.fxml");
+            changeScene(modifyRoomWindowLocation, 460, 360, getSelectedRoom());
+        }
     }
 
     public void deleteRoom() {
-        roomService.delete(getSelectedRoom());
-        refreshAll();
+        if(Objects.isNull(getSelectedRoom())){
+            generateAlert("", "Należy wybrać pokój, który chcemy usunąć.", Alert.AlertType.ERROR);
+        }else {
+            roomService.delete(getSelectedRoom());
+            refreshAll();
+        }
     }
 
     public void generateRoomRaport() {
@@ -131,17 +140,23 @@ public class BasicController implements Initializable {
     }
 
     public void switchModifyGuestWindow(ActionEvent event) throws IOException {
-
-        URL modifyGuestWindowLocation = Main.class.getResource("/" + "modifyGuestWindow.fxml");
-        changeScene(modifyGuestWindowLocation, 460, 360, getSelectedGuest());
-
+        if(Objects.isNull(getSelectedGuest())){
+            generateAlert("", "Należy wybrać gościa, którego chcemy zmodyfikować.", Alert.AlertType.ERROR);
+        }else {
+            URL modifyGuestWindowLocation = Main.class.getResource("/" + "modifyGuestWindow.fxml");
+            changeScene(modifyGuestWindowLocation, 460, 360, getSelectedGuest());
+        }
     }
 
     public void deleteGuest() {
-        System.out.println(getSelectedGuest());
-        guestService.delete(getSelectedGuest());
+        if(Objects.isNull(getSelectedGuest())){
+            generateAlert("", "Należy wybrać gościa, którego chcemy usunąć.", Alert.AlertType.ERROR);
+        }else {
+            System.out.println(getSelectedGuest());
+            guestService.delete(getSelectedGuest());
 
-        refreshAll();
+            refreshAll();
+        }
     }
 
     // ---- reservations ----
@@ -154,18 +169,25 @@ public class BasicController implements Initializable {
     }
 
     public void switchModifyReservationWindow() {
-        URL modifyReservationWindowLocation = Main.class.getResource("/" + "modifyReservationWindow.fxml");
-        ArrayList<Object> list = new ArrayList<>();
-        list.add(getSelectedReservation());
-        list.add(guestsTable.getItems());
-        list.add(roomsTable.getItems());
-
-        changeScene(modifyReservationWindowLocation, 460, 360, list);
+        if(Objects.isNull(getSelectedReservation())){
+            generateAlert("", "Należy wybrać rezerwację, którą chcemy zmodyfikować.", Alert.AlertType.ERROR);
+        }else {
+            URL modifyReservationWindowLocation = Main.class.getResource("/" + "modifyReservationWindow.fxml");
+            ArrayList<Object> list = new ArrayList<>();
+            list.add(getSelectedReservation());
+            list.add(guestsTable.getItems());
+            list.add(roomsTable.getItems());
+            changeScene(modifyReservationWindowLocation, 460, 360, list);
+        }
     }
 
     public void deleteReservation() {
-        reservationService.delete(getSelectedReservation());
-        refreshAll();
+        if(Objects.isNull(getSelectedReservation())){
+            generateAlert("", "Należy wybrać rezerwację, którą chcemy usunąć.", Alert.AlertType.ERROR);
+        }else {
+            reservationService.delete(getSelectedReservation());
+            refreshAll();
+        }
     }
 
     public void generateReservationReport() {
@@ -174,11 +196,14 @@ public class BasicController implements Initializable {
     }
 
     public void paidWindow() {
-        Reservation r = getSelectedReservation();
-        URL addPayWindowLocation = Main.class.getResource("/" + "addPayWindow.fxml");
-        Reservation reservation = getSelectedReservation();
-        changeScene(addPayWindowLocation, 460, 360, reservation);
+        if (Objects.isNull(getSelectedReservation())) {
+            generateAlert("", "Należy wybrać rezerwację, którą chcemy opłacić.", Alert.AlertType.ERROR);
+        }else {
+            URL addPayWindowLocation = Main.class.getResource("/" + "addPayWindow.fxml");
+            changeScene(addPayWindowLocation, 460, 360, getSelectedReservation());
+        }
     }
+
 
     public void warningRefreshReservations() {
         List<Reservation> outdatedReservations = reservationService.getOutdatedNoPaidReservation();

@@ -36,9 +36,6 @@ import static java.time.temporal.ChronoUnit.DAYS;
 public class PayForReservationController implements Initializable, InitializeController {
 
     @FXML
-    private Label currencyValue;
-
-    @FXML
     private TextField reservationId;
 
     @FXML
@@ -47,28 +44,29 @@ public class PayForReservationController implements Initializable, InitializeCon
     @FXML
     private ComboBox<String> possibleCurrency;
 
+    @FXML
+    private Label currencyValue;
+
     private final CurrencyService currencyService;
     private final ReservationService reservationService;
 
     private Reservation selectedReservation;
+
+    private boolean firstTime;
 
 
     @Autowired
     public PayForReservationController(CurrencyService currencyService, ReservationService reservationService) {
         this.currencyService = currencyService;
         this.reservationService = reservationService;
+        firstTime = true;
     }
 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        possibleCurrency.valueProperty().addListener((observable) -> rateValue());
         InitPayForReservationWindow();
-    }
-
-    private ObservableList<String> InitCurrency() {
-        ObservableList<String> observableList = FXCollections.observableArrayList();
-        observableList.addAll(currencyService.getPossibleRates());
-        return observableList;
     }
 
     public void payForReservation() {
@@ -78,8 +76,8 @@ public class PayForReservationController implements Initializable, InitializeCon
         }else if(!selectedReservation.isPayed()){
             System.out.println("paid from user");
             selectedReservation.setPayed(true);
+            reservationService.update(selectedReservation);
         }
-        // printTextFields();
         switchMainWindow();
     }
 
@@ -95,32 +93,36 @@ public class PayForReservationController implements Initializable, InitializeCon
     }
 
     public void rateValue() {
-        if (currencyService.getCurrencyRestModel() != null) {
-            String convertedVal = String.valueOf(
-                    currencyService
-                            .getStrategyContext()
-                            .findStrategy(possibleCurrency.getValue())
-                            .rateMoney(30, currencyService.getCurrencyRestModel().getRates()));     //TODO HARDCODED CASH
+        if(firstTime){
+            firstTime = false;
+            return;
+        }else {
+            if (currencyService.getCurrencyRestModel() != null) {
+                String convertedVal = String.valueOf(
+                        currencyService
+                                .getStrategyContext()
+                                .findStrategy(possibleCurrency.getValue())
+                                .rateMoney(Float.valueOf(reservationTotalPrice.getText()), currencyService.getCurrencyRestModel().getRates()));     //TODO HARDCODED CASH
 
-            currencyValue.setText(convertedVal);
+                currencyValue.setText(convertedVal);
+            }
         }
     }
 
     public void switchMainWindow() {
+        firstTime = true;
         AuxiliaryController.switchMainWindow();
     }
 
     private void PayForReservationSetData() {
-
         reservationId.setText(selectedReservation.getId());
         reservationTotalPrice.setText(String.valueOf(selectedReservation.getTotalPrice()));
     }
 
     @Override
     public void initData(Object object) {
-
         selectedReservation = (Reservation)object;
-
         PayForReservationSetData();
+        rateValue();
     }
 }

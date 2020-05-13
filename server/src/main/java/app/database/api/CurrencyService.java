@@ -22,6 +22,7 @@ public class CurrencyService {
     public CurrencyService(RestTemplate restTemplate, StrategyContext strategyContext) {
         this.restTemplate = restTemplate;
         this.strategyContext = strategyContext;
+        getCurrency();
     }
 
     public void getCurrency() {

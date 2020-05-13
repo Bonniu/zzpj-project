@@ -97,6 +97,11 @@ public class ModifyReservationController implements Initializable, InitializeCon
 
     public void modifyReservation() throws ParseException {
 
+        if (getReservationStartDate().getValue().isAfter(getReservationEndDate().getValue())
+                || getReservationStartDate().getValue().isEqual(getReservationEndDate().getValue())) {
+            generateAlert("", "Data rozpoczęcia musi być przed datą zakończenia rezerwacji!", Alert.AlertType.ERROR);
+            return;
+        }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         DateFormat originalFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -205,10 +210,7 @@ public class ModifyReservationController implements Initializable, InitializeCon
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // jak nie wciskamy generuj raport to ...
-        if (!url.toString().contains("reservationReportWindow") && !url.toString().contains("addPayWindow")) {
             reservationStartDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
             reservationEndDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
-        }
     }
 }
