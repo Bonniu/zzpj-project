@@ -177,7 +177,8 @@ public class BasicController implements Initializable {
     public void paidWindow() {
         Reservation r = getSelectedReservation();
         URL addPayWindowLocation = Main.class.getResource("/" + "addPayWindow.fxml");
-        changeScene(addPayWindowLocation, 460, 360);
+        Reservation reservation = getSelectedReservation();
+        changeScene(addPayWindowLocation, 460, 360, reservation);
     }
 
     public void warningRefreshReservations() {

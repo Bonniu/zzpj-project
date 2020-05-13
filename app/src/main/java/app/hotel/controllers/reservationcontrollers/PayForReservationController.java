@@ -5,6 +5,7 @@ import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.database.entities.Room;
 import app.hotel.controllers.AuxiliaryController;
+import app.hotel.controllers.InitializeController;
 import app.hotel.dbservices.implementation.GuestService;
 import app.hotel.dbservices.implementation.ReservationService;
 import app.hotel.dbservices.implementation.RoomService;
@@ -32,7 +33,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 @Getter
 @Controller
-public class PayForReservationController implements Initializable {
+public class PayForReservationController implements Initializable, InitializeController {
 
     @FXML
     private Label currencyValue;
@@ -40,26 +41,8 @@ public class PayForReservationController implements Initializable {
     @FXML
     private TextField reservationId;
 
-
-    @FXML
-    private ChoiceBox choiceBoxGuestId;
-
-    @FXML
-    private ChoiceBox choiceBoxRoomId;
-
-
-    @FXML
-    private DatePicker reservationStartDate;
-
-
-    @FXML
-    private DatePicker reservationEndDate;
-
     @FXML
     private TextField reservationTotalPrice;
-
-    @FXML
-    private TextField reservationIdPayed;
 
     @FXML
     private ComboBox<String> possibleCurrency;
@@ -89,7 +72,13 @@ public class PayForReservationController implements Initializable {
     }
 
     public void payForReservation() {
-        System.out.println("paid from user");
+        if(selectedReservation.isPayed()){
+            generateAlert("", "Rezerwacja jest już opłacona.", Alert.AlertType.INFORMATION);
+            return;
+        }else if(!selectedReservation.isPayed()){
+            System.out.println("paid from user");
+            selectedReservation.setPayed(true);
+        }
         // printTextFields();
         switchMainWindow();
     }
@@ -119,5 +108,19 @@ public class PayForReservationController implements Initializable {
 
     public void switchMainWindow() {
         AuxiliaryController.switchMainWindow();
+    }
+
+    private void PayForReservationSetData() {
+
+        reservationId.setText(selectedReservation.getId());
+        reservationTotalPrice.setText(String.valueOf(selectedReservation.getTotalPrice()));
+    }
+
+    @Override
+    public void initData(Object object) {
+
+        selectedReservation = (Reservation)object;
+
+        PayForReservationSetData();
     }
 }

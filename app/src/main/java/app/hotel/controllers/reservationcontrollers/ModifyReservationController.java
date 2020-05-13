@@ -33,9 +33,6 @@ import static java.time.temporal.ChronoUnit.DAYS;
 public class ModifyReservationController implements Initializable, InitializeController {
 
     @FXML
-    private Label currencyValue;
-
-    @FXML
     private TextField reservationId;
 
 
