@@ -7,7 +7,7 @@
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="360.0"
       prefWidth="460.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="app.hotel.controllers.RoomController">
+      fx:controller="app.hotel.controllers.roomcontroller.AddRoomController">
     <children>
         <Label layoutX="102.0" layoutY="61.0" text="Numer pokoju:"/>
         <Label layoutX="102.0" layoutY="131.0" prefHeight="17.0" prefWidth="77.0" text="Pojemność:"/>

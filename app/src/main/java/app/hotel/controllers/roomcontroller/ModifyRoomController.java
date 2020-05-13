@@ -1,6 +1,8 @@
-package app.hotel.controllers;
+package app.hotel.controllers.roomcontroller;
 
 import app.database.entities.Room;
+import app.hotel.controllers.AuxiliaryController;
+import app.hotel.controllers.InitializeController;
 import app.hotel.dbservices.implementation.RoomService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -12,7 +14,8 @@ import org.springframework.stereotype.Controller;
 
 @Getter
 @Controller
-public class RoomController implements InitializeController {
+public class ModifyRoomController implements InitializeController {
+
     @FXML
     private TextField roomNumber;
     @FXML
@@ -26,17 +29,6 @@ public class RoomController implements InitializeController {
 
     @Autowired
     private RoomService roomService;
-
-    public void addRoom() {
-        Room room = new Room();
-        room.setNumber(getRoomNumber().getText());
-        room.setCapacity(Integer.parseInt(getRoomCapacity().getText()));
-        room.setPrice(Float.parseFloat(getRoomPrice().getText()));
-        room.setState("dostępny");
-
-        roomService.insert(room);
-        switchMainWindow();
-    }
 
     public void modifyRoom() {
         selectedRoom.setNumber(roomNumber.getText());
