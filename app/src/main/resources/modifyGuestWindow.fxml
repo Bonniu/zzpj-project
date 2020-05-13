@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.Pane?>
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="360.0"
       prefWidth="460.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="app.hotel.controllers.GuestController">
+      fx:controller="app.hotel.controllers.guestcontroller.ModifyGuestController">
     <children>
         <Label layoutX="101.0" layoutY="94.0" text="Imię:"/>
         <Label layoutX="101.0" layoutY="134.0" prefHeight="17.0" prefWidth="77.0" text="Nazwisko:"/>

@@ -171,17 +171,14 @@ public class BasicController implements Initializable {
 
     public void generateReservationReport() {
         URL reservationReportWindowLocation = Main.class.getResource("/" + "reservationReportWindow.fxml");
-        ArrayList<Object> list = new ArrayList<>();
-        list.add(guestService);
-        list.add(roomService);
-        list.add(reservationService);
-        changeScene(reservationReportWindowLocation, 460, 360, list);
+        changeScene(reservationReportWindowLocation, 460, 360);
     }
 
     public void paidWindow() {
         Reservation r = getSelectedReservation();
         URL addPayWindowLocation = Main.class.getResource("/" + "addPayWindow.fxml");
-        changeScene(addPayWindowLocation, 460, 360);
+        Reservation reservation = getSelectedReservation();
+        changeScene(addPayWindowLocation, 460, 360, reservation);
     }
 
     public void warningRefreshReservations() {
