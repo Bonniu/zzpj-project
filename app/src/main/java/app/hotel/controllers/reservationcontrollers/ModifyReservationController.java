@@ -6,6 +6,7 @@ import app.database.entities.Room;
 import app.hotel.controllers.AuxiliaryController;
 import app.hotel.controllers.InitializeController;
 import app.hotel.dbservices.implementation.ReservationService;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -54,7 +55,7 @@ public class ModifyReservationController implements Initializable, InitializeCon
     private TextField reservationTotalPrice;
 
     @FXML
-    private TextField reservationIdPayed;
+    private ChoiceBox reservationIdPayed;
 
     private final ReservationService reservationService;
 
@@ -122,7 +123,7 @@ public class ModifyReservationController implements Initializable, InitializeCon
             selectedReservation.setEndDate(LocalDate.parse(formatter.format(reservationEndDate.getValue())));
         }
         selectedReservation.setTotalPrice(Float.parseFloat(reservationTotalPrice.getText()));
-        selectedReservation.setPayed(Boolean.parseBoolean(reservationIdPayed.getText()));
+        selectedReservation.setPayed(stateStringToBoolean((String)reservationIdPayed.getSelectionModel().getSelectedItem()));
 
         reservationService.update(selectedReservation);
         switchMainWindow();
@@ -137,7 +138,9 @@ public class ModifyReservationController implements Initializable, InitializeCon
         reservationStartDate.setValue(selectedReservation.getStartDate());
         reservationEndDate.setValue(selectedReservation.getEndDate());
         reservationTotalPrice.setText(String.valueOf(selectedReservation.getTotalPrice()));
-        reservationIdPayed.setText(String.valueOf(selectedReservation.isPayed()));
+        reservationIdPayed.setItems(FXCollections.observableArrayList("opłacona", "nieopłacona"));
+        System.out.println(stateBooleanToString(selectedReservation.isPayed()));
+        reservationIdPayed.getSelectionModel().select(stateBooleanToString(selectedReservation.isPayed()));
     }
 
     private void choiceBoxSetData(ObservableList<Guest> guestList, ObservableList<Room> roomList) {
@@ -176,6 +179,22 @@ public class ModifyReservationController implements Initializable, InitializeCon
         }
 
 
+    }
+
+    private boolean stateStringToBoolean(String state){
+        if(state.equals("opłacona")) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    private int stateBooleanToString(Boolean state){
+        if(state){
+            return 0;
+        }else {
+            return 1;
+        }
     }
 
 
