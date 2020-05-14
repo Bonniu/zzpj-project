@@ -44,6 +44,26 @@ public class ModifyRoomController implements InitializeController {
         this.validator = validator;
     }
     public void modifyRoom() {
+        try {
+            validator.validateUpdate(new HashMap<>() {{
+                put("capacity", getRoomCapacity().getText());
+                put("price", getRoomPrice().getText());
+            }});
+        }
+        catch (HotelException hotelException){
+            generateAlert("Pokoj nie został zaktualizowany!",
+                    hotelException.displayErrors(),
+                    Alert.AlertType.ERROR);
+            return;
+        }
+        selectedRoom.setNumber(roomNumber.getText());
+        selectedRoom.setCapacity(Integer.parseInt(roomCapacity.getText()));
+        selectedRoom.setPrice(Float.parseFloat(roomPrice.getText()));
+        selectedRoom.setState((String) roomStateChoiceBox.getSelectionModel().getSelectedItem());
+
+        roomService.update(selectedRoom);
+        switchMainWindow();
+
     }
 
     public void switchMainWindow() {
