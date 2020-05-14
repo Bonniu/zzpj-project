@@ -140,6 +140,12 @@ public class BasicController implements Initializable {
     }
 
     public void deleteRoom() {
+        if (Objects.isNull(getSelectedRoom())) {
+            generateAlert("", "Należy wybrać pokój, który chcemy usunąć.", Alert.AlertType.ERROR);
+        } else {
+            roomService.delete(getSelectedRoom());
+            refreshAll();
+        }
     }
 
     public void generateRoomRaport() {
@@ -173,9 +179,25 @@ public class BasicController implements Initializable {
 
     // ---- reservations ----
     public void switchAddReservationWindow() throws IOException {
+        URL addReservationWindowLocation = Main.class.getResource("/" + "addReservationWindow.fxml");
+        ArrayList<Object> list = new ArrayList<>();
+        list.add(guestsTable.getItems());
+        list.add(roomsTable.getItems());
+        changeScene(addReservationWindowLocation, 460, 360, list);
     }
 
     public void switchModifyReservationWindow() {
+        if (Objects.isNull(getSelectedReservation())) {
+            generateAlert("", "Należy wybrać rezerwację, którą chcemy zmodyfikować.", Alert.AlertType.ERROR);
+        } else {
+            URL modifyReservationWindowLocation = Main.class.getResource("/" + "modifyReservationWindow.fxml");
+            ArrayList<Object> list = new ArrayList<>();
+            list.add(getSelectedReservation());
+            list.add(guestsTable.getItems());
+            list.add(roomsTable.getItems());
+            list.add(guestService);
+            changeScene(modifyReservationWindowLocation, 460, 360, list);
+        }
     }
 
     public void deleteReservation() {
@@ -193,6 +215,17 @@ public class BasicController implements Initializable {
     }
 
     public void paidWindow() {
+        if (Objects.isNull(getSelectedReservation())) {
+            generateAlert("", "Należy wybrać rezerwację, którą chcemy opłacić.", Alert.AlertType.ERROR);
+        } else if (getSelectedReservation().isPayed()) {
+            generateAlert("", "Rezerwacja jest już opłacona.", Alert.AlertType.INFORMATION);
+        } else {
+            URL addPayWindowLocation = Main.class.getResource("/" + "addPayWindow.fxml");
+            ArrayList<Object> list = new ArrayList<>();
+            list.add(getSelectedReservation());
+            list.add(guestService);
+            changeScene(addPayWindowLocation, 460, 360, list);
+        }
     }
 
 
@@ -211,6 +244,33 @@ public class BasicController implements Initializable {
     }
 
     public void refreshReservations() {
+        /////////////RESERVATION//////////////////////////
+        reservationList.clear();
+        reservationList.addAll(reservationService.findAll());
+
+
+        reservationId.setCellValueFactory(reservationStringCellDataFeatures ->
+                new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getId())
+        );
+        guestID.setCellValueFactory(reservationStringCellDataFeatures ->
+                new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getGuestId())
+        );
+        roomID.setCellValueFactory(reservationStringCellDataFeatures ->
+                new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getRoomId())
+        );
+        startDate.setCellValueFactory(reservationStringCellDataFeatures ->
+                new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getStartDate().toString())
+        );
+        endDate.setCellValueFactory(reservationStringCellDataFeatures ->
+                new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getEndDate().toString())
+        );
+        totalPrice.setCellValueFactory(reservationStringCellDataFeatures ->
+                new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getTotalPrice())
+        );
+        isPayed.setCellValueFactory(reservationBooleanProperty ->
+                new SimpleBooleanProperty(reservationBooleanProperty.getValue().isPayed())
+        );
+        reservationsTable.setItems(reservationList);
     }
 
     // ---- other methods ----
