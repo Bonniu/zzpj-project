@@ -56,7 +56,7 @@ public class AddGuestController {
         }
         catch (HotelException hotelException){
             generateAlert("Gość nie został dodany!",
-                    hotelException.getErrors().toString(),
+                    hotelException.displayErrors(),
                     Alert.AlertType.ERROR);
             return;
         }

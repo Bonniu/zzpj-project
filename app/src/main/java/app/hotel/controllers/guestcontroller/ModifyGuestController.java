@@ -65,7 +65,7 @@ public class ModifyGuestController implements InitializeController {
         }
         catch (HotelException hotelException){
             generateAlert("Gość nie został zaktualizowany!",
-                    hotelException.getErrors().toString(),
+                    hotelException.displayErrors(),
                     Alert.AlertType.ERROR);
             return;
         }

@@ -90,7 +90,7 @@ public class AddReservationController implements Initializable, InitializeContro
         }
         catch (HotelException hotelException){
             generateAlert("Rezerwacja nie została dodana!",
-                    hotelException.getErrors().toString(),
+                    hotelException.displayErrors(),
                     Alert.AlertType.ERROR);
             return;
         }

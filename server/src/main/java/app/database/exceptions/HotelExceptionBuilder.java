@@ -20,8 +20,9 @@ public class HotelExceptionBuilder {
     }
 
     public HotelException build(){
-        HotelException chatbotException = new HotelException();
-        chatbotException.setErrors(errors);
-        return chatbotException;
+        HotelException hotelException = new HotelException();
+        hotelException.setErrors(new ArrayList<>(errors));
+        errors.clear();
+        return hotelException;
     }
 }

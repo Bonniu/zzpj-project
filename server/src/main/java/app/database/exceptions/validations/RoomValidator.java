@@ -1,7 +1,6 @@
 package app.database.exceptions.validations;
 
 import app.database.exceptions.HotelException;
-import app.database.exceptions.HotelExceptionBuilder;
 import app.database.exceptions.messages.RoomErrorMessages;
 
 import java.util.HashMap;

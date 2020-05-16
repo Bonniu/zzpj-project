@@ -109,7 +109,7 @@ public class ModifyReservationController implements Initializable, InitializeCon
         }
         catch (HotelException hotelException){
             generateAlert("Rezerwacja nie została zaktualizowana!",
-                    hotelException.getErrors().toString(),
+                    hotelException.displayErrors(),
                     Alert.AlertType.ERROR);
             return;
         }

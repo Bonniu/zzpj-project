@@ -2,7 +2,7 @@ package app.database.exceptions.validations;
 
 import app.database.exceptions.HotelException;
 import app.database.exceptions.HotelExceptionBuilder;
-import app.database.exceptions.messages.ReservationErrorMessages;
+import app.database.exceptions.messages.RoomErrorMessages;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -13,7 +13,10 @@ public class ReservationValidator implements Validator<HashMap<String, String>> 
     public void validateInsert(HashMap<String, String> param) throws HotelException {
         if (LocalDate.parse(param.get("setStartDate")).isAfter(LocalDate.parse(param.get("setEndDate"))) ||
                 LocalDate.parse(param.get("setStartDate")).isEqual(LocalDate.parse(param.get("setEndDate"))))
-            throw new HotelExceptionBuilder().addError(ReservationErrorMessages.WRONG_DATE).build();
+            hotelExceptionBuilder.addError(RoomErrorMessages.WRONG_PRICE);
+
+        if (hotelExceptionBuilder.isError())
+            throw hotelExceptionBuilder.build();
 
     }
 

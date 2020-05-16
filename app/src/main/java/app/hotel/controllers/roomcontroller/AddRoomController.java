@@ -45,7 +45,7 @@ public class AddRoomController  {
         }
         catch (HotelException hotelException){
             generateAlert("Pokoj nie został dodany!",
-                    hotelException.getErrors().toString(),
+                    hotelException.displayErrors(),
                     Alert.AlertType.ERROR);
             return;
         }

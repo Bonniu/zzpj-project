@@ -52,7 +52,7 @@ public class ModifyRoomController implements InitializeController {
         }
         catch (HotelException hotelException){
             generateAlert("Pokoj nie został zaktualizowany!",
-                    hotelException.getErrors().toString(),
+                    hotelException.displayErrors(),
                     Alert.AlertType.ERROR);
             return;
         }

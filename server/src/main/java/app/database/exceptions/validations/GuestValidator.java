@@ -29,7 +29,6 @@ public class GuestValidator implements Validator<HashMap<String, String>> {
     @Override
     public void validateUpdate(HashMap<String, String> param) throws HotelException {
 
-        long discount;
         try {
             Long.parseLong(param.get("phoneNumber"));
         } catch (NumberFormatException nfe) {
@@ -37,7 +36,7 @@ public class GuestValidator implements Validator<HashMap<String, String>> {
         }
 
         try {
-            discount = Long.parseLong(param.get("discount"));
+            long discount = Long.parseLong(param.get("discount"));
             if (discount < 0 || discount > 20)
                 hotelExceptionBuilder.addError(GuestErrorMessages.WRONG_DISCOUNT_VALUE);
 
