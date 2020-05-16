@@ -1,8 +1,12 @@
 spring:
   javafx:
     title: "Hotel application"
+  admin:
+    password: "{bcrypt}$2a$10$P9VzJNkcQUXIZ8bgNA293eY8avEy9MLWCxUGALuyyqWxF17US9RfG"
   data:
     mongodb:
       database: HotelRafonix
       port: 27017
       host: localhost
+
+      # Admin123

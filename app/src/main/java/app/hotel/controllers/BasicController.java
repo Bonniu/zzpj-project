@@ -3,6 +3,7 @@ package app.hotel.controllers;
 import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.database.entities.Room;
+import app.database.exceptions.HotelException;
 import app.hotel.Main;
 import app.hotel.services.implementation.GuestService;
 import app.hotel.services.implementation.ReservationService;
@@ -17,6 +18,14 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
@@ -33,6 +42,7 @@ import static app.hotel.controllers.AuxiliaryController.generateAlert;
 @Controller
 public class BasicController implements Initializable {
 
+    public TextField auth;
     @FXML
     private TableView<Room> roomsTable;
 
@@ -47,7 +57,11 @@ public class BasicController implements Initializable {
     @FXML
     private TableColumn<Room, String> roomState;
 
-    public BasicController(GuestService guestService, ReservationService reservationService, RoomService roomService) {
+    private AuthenticationManager authenticationManager;
+
+    public BasicController(AuthenticationManager authenticationManager, GuestService guestService,
+                           ReservationService reservationService, RoomService roomService) {
+        this.authenticationManager = authenticationManager;
         this.guestService = guestService;
         this.reservationService = reservationService;
         this.roomService = roomService;
@@ -305,4 +319,23 @@ public class BasicController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         refreshAll();
     }
+
+    public void getAuthorizaction(KeyEvent keyEvent) {
+        if(keyEvent.getCode() == KeyCode.ENTER){
+            Authentication authToken = new UsernamePasswordAuthenticationToken("admin", auth.getText());
+            try {
+                authToken = authenticationManager.authenticate(authToken);
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+                generateAlert("zajebiscie mordo",
+                        "hotelException.displayErrors()",
+                        Alert.AlertType.INFORMATION);
+            }
+            catch (AuthenticationException e){
+                generateAlert("chuja",
+                        "hotelException.displayErrors()",
+                        Alert.AlertType.ERROR);
+            }
+        }
+    }
+
 }
