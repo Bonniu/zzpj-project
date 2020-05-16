@@ -12,7 +12,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.TextField;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -106,8 +109,7 @@ public class ModifyReservationController implements Initializable, InitializeCon
                 put("setStartDate", getReservationStartDate().getValue().toString());
                 put("setEndDate", getReservationEndDate().getValue().toString());
             }});
-        }
-        catch (HotelException hotelException){
+        } catch (HotelException hotelException) {
             generateAlert("Rezerwacja nie została zaktualizowana!",
                     hotelException.displayErrors(),
                     Alert.AlertType.ERROR);
@@ -139,7 +141,7 @@ public class ModifyReservationController implements Initializable, InitializeCon
             selectedReservation.setEndDate(LocalDate.parse(formatter.format(reservationEndDate.getValue())));
         }
         selectedReservation.setTotalPrice(reservationTotalPrice.getText());
-        selectedReservation.setPayed(stateStringToBoolean((String)reservationIdPayed.getSelectionModel().getSelectedItem()));
+        selectedReservation.setPayed(stateStringToBoolean((String) reservationIdPayed.getSelectionModel().getSelectedItem()));
 
         reservationService.update(selectedReservation);
         switchMainWindow();
@@ -171,44 +173,37 @@ public class ModifyReservationController implements Initializable, InitializeCon
             LocalDate startDate = LocalDate.parse(reservationStartDate.getValue().toString());
             LocalDate endDate = LocalDate.parse(getReservationEndDate().getValue().toString());
 
-
             Long daysBetween = DAYS.between(startDate, endDate);
             Float roomPrice = room.getPrice();
             double totalPrice = daysBetween * roomPrice;
-            totalPrice = Math.round(totalPrice * 100.0) / 100.0;
-
 
             if (!Objects.isNull(selectedReservation)) {
                 float prevPrice = Float.parseFloat(selectedReservation.getTotalPrice().split(" ")[0]);
                 if (prevPrice > 0 && selectedReservation.isPayed() && reservationTotalPrice.getText().length() > 0) {
                     System.out.println(reservationTotalPrice.getText());
                     double difference = prevPrice - totalPrice;
+                    difference = Math.abs(Math.round(difference * 100.0) / 100.0);
                     if (difference > 0) {
-                        generateAlert("", "Należy oddać klientowi " + Math.abs(Math.round(difference * 100.0) / 100.0) + ".", Alert.AlertType.INFORMATION);
+                        generateAlert("", "Należy oddać klientowi " + difference + ".", Alert.AlertType.INFORMATION);
                     } else if (difference < 0) {
-                        generateAlert("", "Klient musi dopłacić " + Math.abs(Math.round(difference * 100.0) / 100.0) + ".", Alert.AlertType.INFORMATION);
+                        generateAlert("", "Klient musi dopłacić " + difference + ".", Alert.AlertType.INFORMATION);
                     }
                 }
             }
-
-            reservationTotalPrice.setText(String.valueOf(totalPrice));
+            reservationTotalPrice.setText(totalPrice + " PLN");
         }
 
 
     }
 
-    private boolean stateStringToBoolean(String state){
-        if(state.equals("opłacona")) {
-            return true;
-        }else{
-            return false;
-        }
+    private boolean stateStringToBoolean(String state) {
+        return state.equals("opłacona");
     }
 
-    private int stateBooleanToString(Boolean state){
-        if(state){
+    private int stateBooleanToString(Boolean state) {
+        if (state) {
             return 0;
-        }else {
+        } else {
             return 1;
         }
     }
@@ -221,7 +216,9 @@ public class ModifyReservationController implements Initializable, InitializeCon
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-            reservationStartDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
-            reservationEndDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
+        reservationStartDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
+        reservationEndDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
+//        choiceBoxGuestId.valueProperty().addListener((observable) -> totalPriceOfReservation());
+//        choiceBoxRoomId.valueProperty().addListener((observable) -> totalPriceOfReservation());
     }
 }
