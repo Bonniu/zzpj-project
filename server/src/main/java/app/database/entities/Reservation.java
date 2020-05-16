@@ -21,6 +21,6 @@ public class Reservation {
     private String roomId;
     private LocalDate startDate;
     private LocalDate endDate;
-    private float totalPrice;
+    private String totalPrice;
     private boolean isPayed;
 }

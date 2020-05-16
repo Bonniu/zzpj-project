@@ -11,7 +11,10 @@ import app.hotel.services.implementation.ReservationService;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.TextField;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -60,13 +63,18 @@ public class AddReservationController implements Initializable, InitializeContro
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-            reservationStartDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
-            reservationEndDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
+        reservationStartDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
+        reservationEndDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
+        choiceBoxGuestId.valueProperty().addListener((observable) -> totalPriceOfReservation());
+        choiceBoxRoomId.valueProperty().addListener((observable) -> totalPriceOfReservation());
     }
 
     private void totalPriceOfReservation() {
+
         //dziura między wyborem daty a wpisaniem jej do edytora
-        if (reservationStartDate.getEditor().getText().length() > 0 || reservationEndDate.getEditor().getText().length() > 0) {
+        if (reservationStartDate.getValue() != null && reservationEndDate.getValue() != null
+                && choiceBoxRoomId.getSelectionModel().getSelectedIndex() > -1
+                && choiceBoxGuestId.getSelectionModel().getSelectedIndex() > -1) {
             Room room = (Room) getChoiceBoxRoomId().getSelectionModel().getSelectedItem();
             LocalDate startDate = LocalDate.parse(reservationStartDate.getValue().toString());
             LocalDate endDate = LocalDate.parse(getReservationEndDate().getValue().toString());
@@ -75,7 +83,10 @@ public class AddReservationController implements Initializable, InitializeContro
             Long daysBetween = DAYS.between(startDate, endDate);
             Float roomPrice = room.getPrice();
             double totalPrice = daysBetween * roomPrice;
+            double discount = totalPrice * 0.01 * ((Guest) getChoiceBoxGuestId().getSelectionModel().getSelectedItem()).getDiscount();
+            totalPrice -= discount;
             totalPrice = Math.round(totalPrice * 100.0) / 100.0;
+            System.out.println(totalPrice);
             reservationTotalPrice.setText(String.valueOf(totalPrice));
         }
     }
@@ -87,8 +98,7 @@ public class AddReservationController implements Initializable, InitializeContro
                 put("setStartDate", getReservationStartDate().getValue().toString());
                 put("setEndDate", getReservationEndDate().getValue().toString());
             }});
-        }
-        catch (HotelException hotelException){
+        } catch (HotelException hotelException) {
             generateAlert("Rezerwacja nie została dodana!",
                     hotelException.displayErrors(),
                     Alert.AlertType.ERROR);
@@ -102,10 +112,9 @@ public class AddReservationController implements Initializable, InitializeContro
         reservation.setRoomId(r.getNumber());
         reservation.setStartDate(LocalDate.parse(getReservationStartDate().getValue().toString()));
         reservation.setEndDate(LocalDate.parse(getReservationEndDate().getValue().toString()));
-
-        reservation.setTotalPrice(Float.parseFloat(getReservationTotalPrice().getText()));
+        double cost = Double.parseDouble(getReservationTotalPrice().getText());
+        reservation.setTotalPrice(cost + " PLN");
         reservation.setPayed(false);
-
         reservationService.insert(reservation);
         switchMainWindow();
     }
@@ -117,11 +126,11 @@ public class AddReservationController implements Initializable, InitializeContro
     @Override
     public void initData(Object object) {
 
-            ArrayList<Object> objectList = (ArrayList<Object>) object;
-            ObservableList<Guest> guestList = (ObservableList<Guest>) objectList.get(0);
-            ObservableList<Room> roomList = ((ObservableList<Room>) objectList.get(1))
-                    .filtered(x -> !x.getState().equals("niedostępny")); //filtrowanie niedostępnych pokojów
-            choiceBoxSetData(guestList, roomList);
+        ArrayList<Object> objectList = (ArrayList<Object>) object;
+        ObservableList<Guest> guestList = (ObservableList<Guest>) objectList.get(0);
+        ObservableList<Room> roomList = ((ObservableList<Room>) objectList.get(1))
+                .filtered(x -> !x.getState().equals("niedostępny")); //filtrowanie niedostępnych pokojów
+        choiceBoxSetData(guestList, roomList);
     }
 
     private void choiceBoxSetData(ObservableList<Guest> guestList, ObservableList<Room> roomList) {
