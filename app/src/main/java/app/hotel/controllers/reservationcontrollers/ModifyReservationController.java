@@ -7,6 +7,7 @@ import app.database.exceptions.HotelException;
 import app.database.exceptions.validations.Validator;
 import app.hotel.controllers.AuxiliaryController;
 import app.hotel.controllers.InitializeController;
+import app.hotel.services.implementation.GuestService;
 import app.hotel.services.implementation.ReservationService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,10 +28,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static app.hotel.controllers.AuxiliaryController.generateAlert;
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -64,6 +62,7 @@ public class ModifyReservationController implements Initializable, InitializeCon
     private ChoiceBox reservationIdPayed;
 
     private final ReservationService reservationService;
+    private GuestService guestService;
     private double previousPrice;
     private Reservation selectedReservation;
     private final Validator<HashMap<String, String>> validator;
@@ -81,6 +80,7 @@ public class ModifyReservationController implements Initializable, InitializeCon
         selectedReservation = (Reservation) objectList.get(0);
         ObservableList<Guest> guestList = (ObservableList<Guest>) objectList.get(1);
         ObservableList<Room> roomList = (ObservableList<Room>) objectList.get(2);
+        guestService = (GuestService) objectList.get(3);
         modifyReservationSetData(guestList, roomList);
         this.previousPrice = countTotalPricePLN();
         reservationTotalPrice.setText(previousPrice + " PLN");
@@ -147,6 +147,7 @@ public class ModifyReservationController implements Initializable, InitializeCon
     private void checkIfOtherPrice() {
         double totalPrice = Double.parseDouble(reservationTotalPrice.getText().split(" ")[0]);
         if (previousPrice > 0 && selectedReservation.isPayed() && reservationTotalPrice.getText().length() > 0) {
+            subtractDiscountFromGuest();
             double difference = previousPrice - totalPrice;
             double differenceABS = Math.abs(Math.round(difference * 100.0) / 100.0);
             if (difference > 0) {
@@ -154,6 +155,18 @@ public class ModifyReservationController implements Initializable, InitializeCon
             } else if (difference < 0) {
                 generateAlert("", "Klient musi dopłacić " + differenceABS + ".", Alert.AlertType.INFORMATION);
             }
+        }
+    }
+
+    private void subtractDiscountFromGuest() {
+        Optional<Guest> guestOpt = guestService.find(selectedReservation.getGuestId());
+        if (guestOpt.isEmpty())
+            return;
+        Guest guest = guestOpt.get();
+        int discount = guest.getDiscount();
+        if (discount > 0) {
+            guest.setDiscount(discount - 1);
+            guestService.update(guest);
         }
     }
 

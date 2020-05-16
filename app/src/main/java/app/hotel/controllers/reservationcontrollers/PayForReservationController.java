@@ -1,9 +1,11 @@
 package app.hotel.controllers.reservationcontrollers;
 
 import app.database.api.CurrencyService;
+import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.hotel.controllers.AuxiliaryController;
 import app.hotel.controllers.InitializeController;
+import app.hotel.services.implementation.GuestService;
 import app.hotel.services.implementation.ReservationService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Controller;
 
 import java.net.URL;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 
@@ -43,6 +47,7 @@ public class PayForReservationController implements Initializable, InitializeCon
     private final ReservationService reservationService;
 
     private Reservation selectedReservation;
+    private GuestService guestService;
 
     private boolean firstTime;
 
@@ -70,9 +75,24 @@ public class PayForReservationController implements Initializable, InitializeCon
             selectedReservation.setTotalPrice(rounded + " " +
                     possibleCurrency.getSelectionModel().getSelectedItem());
             reservationService.update(selectedReservation);
+
+            addGuestDiscount();
         }
         switchMainWindow();
     }
+
+    private void addGuestDiscount() {
+        Optional<Guest> guestOpt = guestService.find(selectedReservation.getGuestId());
+        if (guestOpt.isEmpty())
+            return;
+        Guest guest = guestOpt.get();
+        int discount = guest.getDiscount();
+        if (discount < 10) {
+            guest.setDiscount(discount + 1);
+            guestService.update(guest);
+        }
+    }
+
 
     private void InitPayForReservationWindow() {
         if (possibleCurrency == null)
@@ -114,7 +134,8 @@ public class PayForReservationController implements Initializable, InitializeCon
 
     @Override
     public void initData(Object object) {
-        selectedReservation = (Reservation) object;
+        selectedReservation = (Reservation) ((ArrayList<Object>) object).get(0);
+        guestService = (GuestService) ((ArrayList<Object>) object).get(1);
         PayForReservationSetData();
         rateValue();
     }

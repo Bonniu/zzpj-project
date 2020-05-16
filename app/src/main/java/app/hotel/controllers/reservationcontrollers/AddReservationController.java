@@ -86,7 +86,6 @@ public class AddReservationController implements Initializable, InitializeContro
             double discount = totalPrice * 0.01 * ((Guest) getChoiceBoxGuestId().getSelectionModel().getSelectedItem()).getDiscount();
             totalPrice -= discount;
             totalPrice = Math.round(totalPrice * 100.0) / 100.0;
-            System.out.println(totalPrice);
             reservationTotalPrice.setText(String.valueOf(totalPrice));
         }
     }

@@ -172,9 +172,7 @@ public class BasicController implements Initializable {
         if (Objects.isNull(getSelectedGuest())) {
             generateAlert("", "Należy wybrać gościa, którego chcemy usunąć.", Alert.AlertType.ERROR);
         } else {
-            System.out.println(getSelectedGuest());
             guestService.delete(getSelectedGuest());
-
             refreshAll();
         }
     }
@@ -197,6 +195,7 @@ public class BasicController implements Initializable {
             list.add(getSelectedReservation());
             list.add(guestsTable.getItems());
             list.add(roomsTable.getItems());
+            list.add(guestService);
             changeScene(modifyReservationWindowLocation, 460, 360, list);
         }
     }
@@ -222,7 +221,10 @@ public class BasicController implements Initializable {
             generateAlert("", "Rezerwacja jest już opłacona.", Alert.AlertType.INFORMATION);
         } else {
             URL addPayWindowLocation = Main.class.getResource("/" + "addPayWindow.fxml");
-            changeScene(addPayWindowLocation, 460, 360, getSelectedReservation());
+            ArrayList<Object> list = new ArrayList<>();
+            list.add(getSelectedReservation());
+            list.add(guestService);
+            changeScene(addPayWindowLocation, 460, 360, list);
         }
     }
 

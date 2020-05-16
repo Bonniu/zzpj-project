@@ -62,8 +62,7 @@ public class ModifyGuestController implements InitializeController {
                 put("phoneNumber", guestPhonenumber.getText());
                 put("discount", guestDiscount.getText());
             }});
-        }
-        catch (HotelException hotelException){
+        } catch (HotelException hotelException) {
             generateAlert("Gość nie został zaktualizowany!",
                     hotelException.displayErrors(),
                     Alert.AlertType.ERROR);
@@ -73,9 +72,7 @@ public class ModifyGuestController implements InitializeController {
         selectedGuest.setName(guestName.getText());
         selectedGuest.setSurname(guestSurname.getText());
         selectedGuest.setPhoneNumber(Integer.parseInt(guestPhonenumber.getText()));
-        selectedGuest.setDiscount(0);
-        //TODO
-        // selectedGuest.setDiscount(Integer.parseInt(getGuestDiscount().getText()));
+        selectedGuest.setDiscount(Integer.parseInt(guestDiscount.getText()));
         guestService.update(selectedGuest);
         switchMainWindow();
     }
