@@ -3,13 +3,15 @@ package app.hotel.controllers;
 import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.database.entities.Room;
-import app.database.exceptions.HotelException;
 import app.hotel.Main;
+import app.hotel.reportmakers.RoomReport;
 import app.hotel.services.implementation.GuestService;
 import app.hotel.services.implementation.ReservationService;
 import app.hotel.services.implementation.RoomService;
-import app.hotel.reportmakers.RoomReport;
-import javafx.beans.property.*;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleFloatProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -95,10 +97,9 @@ public class BasicController implements Initializable {
             guestID,
             roomID,
             startDate,
+            totalPrice,
             endDate;
 
-    @FXML
-    private TableColumn<Reservation, Number> totalPrice;
     @FXML
     private TableColumn<Reservation, Boolean> isPayed;
 
@@ -125,18 +126,18 @@ public class BasicController implements Initializable {
     }
 
     public void switchModifyRoomWindow() {
-        if(Objects.isNull(getSelectedRoom())){
+        if (Objects.isNull(getSelectedRoom())) {
             generateAlert("", "Należy wybrać pokój, który chcemy zmodyfikować.", Alert.AlertType.ERROR);
-        }else {
+        } else {
             URL modifyRoomWindowLocation = Main.class.getResource("/" + "modifyRoomWindow.fxml");
             changeScene(modifyRoomWindowLocation, 460, 360, getSelectedRoom());
         }
     }
 
     public void deleteRoom() {
-        if(Objects.isNull(getSelectedRoom())){
+        if (Objects.isNull(getSelectedRoom())) {
             generateAlert("", "Należy wybrać pokój, który chcemy usunąć.", Alert.AlertType.ERROR);
-        }else {
+        } else {
             roomService.delete(getSelectedRoom());
             refreshAll();
         }
@@ -154,18 +155,18 @@ public class BasicController implements Initializable {
     }
 
     public void switchModifyGuestWindow(ActionEvent event) throws IOException {
-        if(Objects.isNull(getSelectedGuest())){
+        if (Objects.isNull(getSelectedGuest())) {
             generateAlert("", "Należy wybrać gościa, którego chcemy zmodyfikować.", Alert.AlertType.ERROR);
-        }else {
+        } else {
             URL modifyGuestWindowLocation = Main.class.getResource("/" + "modifyGuestWindow.fxml");
             changeScene(modifyGuestWindowLocation, 460, 360, getSelectedGuest());
         }
     }
 
     public void deleteGuest() {
-        if(Objects.isNull(getSelectedGuest())){
+        if (Objects.isNull(getSelectedGuest())) {
             generateAlert("", "Należy wybrać gościa, którego chcemy usunąć.", Alert.AlertType.ERROR);
-        }else {
+        } else {
             System.out.println(getSelectedGuest());
             guestService.delete(getSelectedGuest());
 
@@ -183,9 +184,9 @@ public class BasicController implements Initializable {
     }
 
     public void switchModifyReservationWindow() {
-        if(Objects.isNull(getSelectedReservation())){
+        if (Objects.isNull(getSelectedReservation())) {
             generateAlert("", "Należy wybrać rezerwację, którą chcemy zmodyfikować.", Alert.AlertType.ERROR);
-        }else {
+        } else {
             URL modifyReservationWindowLocation = Main.class.getResource("/" + "modifyReservationWindow.fxml");
             ArrayList<Object> list = new ArrayList<>();
             list.add(getSelectedReservation());
@@ -196,9 +197,9 @@ public class BasicController implements Initializable {
     }
 
     public void deleteReservation() {
-        if(Objects.isNull(getSelectedReservation())){
+        if (Objects.isNull(getSelectedReservation())) {
             generateAlert("", "Należy wybrać rezerwację, którą chcemy usunąć.", Alert.AlertType.ERROR);
-        }else {
+        } else {
             reservationService.delete(getSelectedReservation());
             refreshAll();
         }
@@ -212,7 +213,10 @@ public class BasicController implements Initializable {
     public void paidWindow() {
         if (Objects.isNull(getSelectedReservation())) {
             generateAlert("", "Należy wybrać rezerwację, którą chcemy opłacić.", Alert.AlertType.ERROR);
-        }else {
+        } else if (getSelectedReservation().isPayed()) {
+            generateAlert("", "Rezerwacja jest już opłacona.", Alert.AlertType.INFORMATION);
+        }
+        else {
             URL addPayWindowLocation = Main.class.getResource("/" + "addPayWindow.fxml");
             changeScene(addPayWindowLocation, 460, 360, getSelectedReservation());
         }
@@ -254,8 +258,8 @@ public class BasicController implements Initializable {
         endDate.setCellValueFactory(reservationStringCellDataFeatures ->
                 new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getEndDate().toString())
         );
-        totalPrice.setCellValueFactory(reservationFloatCellDataFeatures ->
-                new SimpleFloatProperty(reservationFloatCellDataFeatures.getValue().getTotalPrice())
+        totalPrice.setCellValueFactory(reservationStringCellDataFeatures ->
+                new SimpleStringProperty(reservationStringCellDataFeatures.getValue().getTotalPrice())
         );
         isPayed.setCellValueFactory(reservationBooleanProperty ->
                 new SimpleBooleanProperty(reservationBooleanProperty.getValue().isPayed())
@@ -321,7 +325,7 @@ public class BasicController implements Initializable {
     }
 
     public void getAuthorizaction(KeyEvent keyEvent) {
-        if(keyEvent.getCode() == KeyCode.ENTER){
+        if (keyEvent.getCode() == KeyCode.ENTER) {
             Authentication authToken = new UsernamePasswordAuthenticationToken("admin", auth.getText());
             try {
                 authToken = authenticationManager.authenticate(authToken);
@@ -329,8 +333,7 @@ public class BasicController implements Initializable {
                 generateAlert("zajebiscie mordo",
                         "hotelException.displayErrors()",
                         Alert.AlertType.INFORMATION);
-            }
-            catch (AuthenticationException e){
+            } catch (AuthenticationException e) {
                 generateAlert("chuja",
                         "hotelException.displayErrors()",
                         Alert.AlertType.ERROR);

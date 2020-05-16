@@ -102,8 +102,8 @@ public class AddReservationController implements Initializable, InitializeContro
         reservation.setRoomId(r.getNumber());
         reservation.setStartDate(LocalDate.parse(getReservationStartDate().getValue().toString()));
         reservation.setEndDate(LocalDate.parse(getReservationEndDate().getValue().toString()));
-
-        reservation.setTotalPrice(Float.parseFloat(getReservationTotalPrice().getText()));
+        System.out.println(getReservationTotalPrice().getText());
+        reservation.setTotalPrice(getReservationTotalPrice().getText() + " PLN");
         reservation.setPayed(false);
 
         reservationService.insert(reservation);

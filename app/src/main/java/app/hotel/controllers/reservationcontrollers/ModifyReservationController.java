@@ -138,7 +138,7 @@ public class ModifyReservationController implements Initializable, InitializeCon
         } else {
             selectedReservation.setEndDate(LocalDate.parse(formatter.format(reservationEndDate.getValue())));
         }
-        selectedReservation.setTotalPrice(Float.parseFloat(reservationTotalPrice.getText()));
+        selectedReservation.setTotalPrice(reservationTotalPrice.getText());
         selectedReservation.setPayed(stateStringToBoolean((String)reservationIdPayed.getSelectionModel().getSelectedItem()));
 
         reservationService.update(selectedReservation);
@@ -179,9 +179,9 @@ public class ModifyReservationController implements Initializable, InitializeCon
 
 
             if (!Objects.isNull(selectedReservation)) {
-                if (selectedReservation.getTotalPrice() > 0 && selectedReservation.isPayed() && reservationTotalPrice.getText().length() > 0) {
+                float prevPrice = Float.parseFloat(selectedReservation.getTotalPrice().split(" ")[0]);
+                if (prevPrice > 0 && selectedReservation.isPayed() && reservationTotalPrice.getText().length() > 0) {
                     System.out.println(reservationTotalPrice.getText());
-                    double prevPrice = selectedReservation.getTotalPrice();
                     double difference = prevPrice - totalPrice;
                     if (difference > 0) {
                         generateAlert("", "Należy oddać klientowi " + Math.abs(Math.round(difference * 100.0) / 100.0) + ".", Alert.AlertType.INFORMATION);

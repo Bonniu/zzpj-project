@@ -9,15 +9,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ResourceBundle;
-
-import static app.hotel.controllers.AuxiliaryController.generateAlert;
 
 
 @SuppressWarnings(value = "unchecked")
@@ -61,12 +62,13 @@ public class PayForReservationController implements Initializable, InitializeCon
     }
 
     public void payForReservation() {
-        if(selectedReservation.isPayed()){
-            generateAlert("", "Rezerwacja jest już opłacona.", Alert.AlertType.INFORMATION);
-            return;
-        }else if(!selectedReservation.isPayed()){
-            System.out.println("paid from user");
+        if (!selectedReservation.isPayed()) {
+            String rounded = new DecimalFormat("#.##")
+                    .format(Float.parseFloat(currencyValue.getText()))
+                    .replace(",", ".");
             selectedReservation.setPayed(true);
+            selectedReservation.setTotalPrice(rounded + " " +
+                    possibleCurrency.getSelectionModel().getSelectedItem());
             reservationService.update(selectedReservation);
         }
         switchMainWindow();
@@ -84,16 +86,16 @@ public class PayForReservationController implements Initializable, InitializeCon
     }
 
     public void rateValue() {
-        if(firstTime){
+        if (firstTime) {
             firstTime = false;
-            return;
-        }else {
+        } else {
             if (currencyService.getCurrencyRestModel() != null) {
+                float hajs = Float.parseFloat(reservationTotalPrice.getText().split(" ")[0]);
                 String convertedVal = String.valueOf(
                         currencyService
                                 .getStrategyContext()
                                 .findStrategy(possibleCurrency.getValue())
-                                .rateMoney(Float.valueOf(reservationTotalPrice.getText()), currencyService.getCurrencyRestModel().getRates()));     //TODO HARDCODED CASH
+                                .rateMoney(hajs, currencyService.getCurrencyRestModel().getRates()));
 
                 currencyValue.setText(convertedVal);
             }
@@ -112,7 +114,7 @@ public class PayForReservationController implements Initializable, InitializeCon
 
     @Override
     public void initData(Object object) {
-        selectedReservation = (Reservation)object;
+        selectedReservation = (Reservation) object;
         PayForReservationSetData();
         rateValue();
     }
