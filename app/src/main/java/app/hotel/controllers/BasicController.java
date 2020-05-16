@@ -17,12 +17,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.control.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -44,7 +39,10 @@ import static app.hotel.controllers.AuxiliaryController.generateAlert;
 @Controller
 public class BasicController implements Initializable {
 
-    public TextField auth;
+
+    @FXML
+    private PasswordField authPasswordField;
+
     @FXML
     private TableView<Room> roomsTable;
 
@@ -58,6 +56,13 @@ public class BasicController implements Initializable {
     private TableColumn<Room, Number> roomPurchasePrice;
     @FXML
     private TableColumn<Room, String> roomState;
+
+    @FXML
+    private Button deleteRoomBtn;
+
+    @FXML
+    private Button addRoomBtn;
+
 
     private AuthenticationManager authenticationManager;
 
@@ -268,7 +273,9 @@ public class BasicController implements Initializable {
 
     // ---- other methods ----
     public void refreshAll() {
-
+        deleteRoomBtn.setDisable(true);
+        addRoomBtn.setDisable(true);
+        authPasswordField.setText("");
         //////////////GUEST/////////////////////////
         guestList.clear();
         guestList.addAll(guestService.findAll());
@@ -323,20 +330,20 @@ public class BasicController implements Initializable {
         refreshAll();
     }
 
-    public void getAuthorizaction(KeyEvent keyEvent) {
-        if (keyEvent.getCode() == KeyCode.ENTER) {
-            Authentication authToken = new UsernamePasswordAuthenticationToken("admin", auth.getText());
-            try {
-                authToken = authenticationManager.authenticate(authToken);
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-                generateAlert("zajebiscie mordo",
-                        "hotelException.displayErrors()",
-                        Alert.AlertType.INFORMATION);
-            } catch (AuthenticationException e) {
-                generateAlert("chuja",
-                        "hotelException.displayErrors()",
-                        Alert.AlertType.ERROR);
-            }
+    public void getAuthorization() {
+        Authentication authToken = new UsernamePasswordAuthenticationToken("admin", authPasswordField.getText());
+        try {
+            authToken = authenticationManager.authenticate(authToken);
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+            deleteRoomBtn.setDisable(false);
+            addRoomBtn.setDisable(false);
+            authPasswordField.setText("");
+            generateAlert("", "Zalogowano do trybu Admin", Alert.AlertType.INFORMATION);
+        } catch (AuthenticationException e) {
+            deleteRoomBtn.setDisable(true);
+            addRoomBtn.setDisable(true);
+            authPasswordField.setText("");
+            generateAlert("", "Błędne hasło", Alert.AlertType.ERROR);
         }
     }
 
