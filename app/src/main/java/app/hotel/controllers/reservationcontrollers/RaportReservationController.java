@@ -1,9 +1,9 @@
 package app.hotel.controllers.reservationcontrollers;
 
 import app.hotel.controllers.AuxiliaryController;
-import app.hotel.dbservices.implementation.GuestService;
-import app.hotel.dbservices.implementation.ReservationService;
-import app.hotel.dbservices.implementation.RoomService;
+import app.hotel.services.implementation.GuestService;
+import app.hotel.services.implementation.ReservationService;
+import app.hotel.services.implementation.RoomService;
 import app.hotel.reportmakers.ReservationReport;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -11,11 +11,8 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.Date;
 
 import static app.hotel.controllers.AuxiliaryController.generateAlert;
 

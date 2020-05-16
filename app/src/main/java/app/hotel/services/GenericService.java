@@ -1,4 +1,4 @@
-package app.hotel.generic;
+package app.hotel.services;
 
 import java.util.List;
 import java.util.Optional;

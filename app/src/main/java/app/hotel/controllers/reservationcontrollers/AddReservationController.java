@@ -3,20 +3,24 @@ package app.hotel.controllers.reservationcontrollers;
 import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.database.entities.Room;
+import app.database.exceptions.HotelException;
+import app.database.exceptions.validations.Validator;
 import app.hotel.controllers.AuxiliaryController;
 import app.hotel.controllers.InitializeController;
-import app.hotel.dbservices.implementation.ReservationService;
+import app.hotel.services.implementation.ReservationService;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import static app.hotel.controllers.AuxiliaryController.generateAlert;
@@ -44,11 +48,14 @@ public class AddReservationController implements Initializable, InitializeContro
     private TextField reservationTotalPrice;
 
     private final ReservationService reservationService;
+    private final Validator<HashMap<String, String>> validator;
 
 
     @Autowired
-    public AddReservationController(ReservationService reservationService) {
+    public AddReservationController(ReservationService reservationService,
+                                    @Qualifier("reservation") Validator<HashMap<String, String>> validator) {
         this.reservationService = reservationService;
+        this.validator = validator;
     }
 
     @Override
@@ -75,11 +82,19 @@ public class AddReservationController implements Initializable, InitializeContro
 
     public void addReservation() {
 
-        if (getReservationStartDate().getValue().isAfter(getReservationEndDate().getValue())
-                || getReservationStartDate().getValue().isEqual(getReservationEndDate().getValue())) {
-            generateAlert("", "Data rozpoczęcia musi być przed datą zakończenia rezerwacji!", Alert.AlertType.ERROR);
+        try {
+            validator.validateInsert(new HashMap<>() {{
+                put("setStartDate", getReservationStartDate().getValue().toString());
+                put("setEndDate", getReservationEndDate().getValue().toString());
+            }});
+        }
+        catch (HotelException hotelException){
+            generateAlert("Rezerwacja nie została dodana!",
+                    hotelException.displayErrors(),
+                    Alert.AlertType.ERROR);
             return;
         }
+
         Reservation reservation = new Reservation();
         Guest g = (Guest) getChoiceBoxGuestId().getSelectionModel().getSelectedItem();
         Room r = (Room) getChoiceBoxRoomId().getSelectionModel().getSelectedItem();

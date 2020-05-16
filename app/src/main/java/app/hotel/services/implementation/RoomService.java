@@ -1,8 +1,8 @@
-package app.hotel.dbservices.implementation;
+package app.hotel.services.implementation;
 
 import app.database.entities.Room;
 import app.database.repositories.RoomRepository;
-import app.hotel.dbservices.RoomServiceInterface;
+import app.hotel.services.RoomServiceInterface;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,7 +1,6 @@
-package app.hotel.dbservices;
+package app.hotel.services;
 
 import app.database.entities.Room;
-import app.hotel.generic.GenericService;
 
 public interface RoomServiceInterface extends GenericService<Room> {
 }

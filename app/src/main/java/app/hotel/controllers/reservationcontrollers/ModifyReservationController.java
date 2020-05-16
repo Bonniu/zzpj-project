@@ -3,9 +3,11 @@ package app.hotel.controllers.reservationcontrollers;
 import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.database.entities.Room;
+import app.database.exceptions.HotelException;
+import app.database.exceptions.validations.Validator;
 import app.hotel.controllers.AuxiliaryController;
 import app.hotel.controllers.InitializeController;
-import app.hotel.dbservices.implementation.ReservationService;
+import app.hotel.services.implementation.ReservationService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -13,6 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 
 import java.net.URL;
@@ -21,10 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static app.hotel.controllers.AuxiliaryController.generateAlert;
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -60,11 +60,15 @@ public class ModifyReservationController implements Initializable, InitializeCon
     private final ReservationService reservationService;
 
     private Reservation selectedReservation;
+    private final Validator<HashMap<String, String>> validator;
 
     @Autowired
-    public ModifyReservationController(ReservationService reservationService) {
+    public ModifyReservationController(ReservationService reservationService,
+                                       @Qualifier("reservation") Validator<HashMap<String, String>> validator) {
         this.reservationService = reservationService;
+        this.validator = validator;
     }
+
     @Override
     public void initData(Object object) {
         ArrayList<Object> objectList = (ArrayList<Object>) object;
@@ -97,9 +101,16 @@ public class ModifyReservationController implements Initializable, InitializeCon
 
     public void modifyReservation() throws ParseException {
 
-        if (getReservationStartDate().getValue().isAfter(getReservationEndDate().getValue())
-                || getReservationStartDate().getValue().isEqual(getReservationEndDate().getValue())) {
-            generateAlert("", "Data rozpoczęcia musi być przed datą zakończenia rezerwacji!", Alert.AlertType.ERROR);
+        try {
+            validator.validateUpdate(new HashMap<>() {{
+                put("setStartDate", getReservationStartDate().getValue().toString());
+                put("setEndDate", getReservationEndDate().getValue().toString());
+            }});
+        }
+        catch (HotelException hotelException){
+            generateAlert("Rezerwacja nie została zaktualizowana!",
+                    hotelException.displayErrors(),
+                    Alert.AlertType.ERROR);
             return;
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
