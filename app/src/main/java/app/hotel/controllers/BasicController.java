@@ -215,8 +215,7 @@ public class BasicController implements Initializable {
             generateAlert("", "Należy wybrać rezerwację, którą chcemy opłacić.", Alert.AlertType.ERROR);
         } else if (getSelectedReservation().isPayed()) {
             generateAlert("", "Rezerwacja jest już opłacona.", Alert.AlertType.INFORMATION);
-        }
-        else {
+        } else {
             URL addPayWindowLocation = Main.class.getResource("/" + "addPayWindow.fxml");
             changeScene(addPayWindowLocation, 460, 360, getSelectedReservation());
         }

@@ -13,7 +13,8 @@
         <Label layoutX="75.0" layoutY="125.0" prefHeight="17.0" prefWidth="104.0" text="Data początkowa:"/>
         <Label layoutX="75.0" layoutY="160.0" text="Data końcowa:"/>
         <Label layoutX="75.0" layoutY="195.0" prefHeight="17.0" prefWidth="97.0" text="Cena całkowita:"/>
-        <Label layoutX="75.0" layoutY="230.0" prefHeight="17.0" prefWidth="97.0" text="Stan płatności:"/>
+        <Label layoutX="75.0" layoutY="230.0" prefHeight="17.0" prefWidth="97.0" text="Stan płatności:"
+               visible="false"/>
 
         <TextField fx:id="reservationId" disable="true" layoutX="200.0" layoutY="16.0" prefHeight="25.0"
                    prefWidth="200.0"/>
@@ -25,7 +26,7 @@
         <TextField fx:id="reservationTotalPrice" editable="false" layoutX="200.0" layoutY="191.0" prefHeight="25.0"
                    prefWidth="200.0"/>
         <ChoiceBox fx:id="reservationIdPayed" disable="true" layoutX="200.0" layoutY="226.0" prefHeight="25.0"
-                   prefWidth="200.0"/>
+                   prefWidth="200.0" visible="false"/>
 
         <Button defaultButton="true" layoutX="53.0" layoutY="264.0" mnemonicParsing="false"
                 onAction="#modifyReservation" prefHeight="48.0" prefWidth="135.0"

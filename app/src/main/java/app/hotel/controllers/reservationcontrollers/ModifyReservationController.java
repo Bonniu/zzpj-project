@@ -27,7 +27,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.ResourceBundle;
 
 import static app.hotel.controllers.AuxiliaryController.generateAlert;
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -61,7 +64,7 @@ public class ModifyReservationController implements Initializable, InitializeCon
     private ChoiceBox reservationIdPayed;
 
     private final ReservationService reservationService;
-
+    private double previousPrice;
     private Reservation selectedReservation;
     private final Validator<HashMap<String, String>> validator;
 
@@ -78,32 +81,24 @@ public class ModifyReservationController implements Initializable, InitializeCon
         selectedReservation = (Reservation) objectList.get(0);
         ObservableList<Guest> guestList = (ObservableList<Guest>) objectList.get(1);
         ObservableList<Room> roomList = (ObservableList<Room>) objectList.get(2);
+        modifyReservationSetData(guestList, roomList);
+        this.previousPrice = countTotalPricePLN();
+        reservationTotalPrice.setText(previousPrice + " PLN");
+    }
 
-        int i = 0;
-        int guestIndex = 0;
-        for (Guest guest : guestList) {
-            if (guest.getPesel().equals(selectedReservation.getGuestId())) {
-                guestIndex = i;
-            }
-            i++;
-        }
-        i = 0;
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        reservationStartDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
+        reservationEndDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
+        choiceBoxGuestId.valueProperty().addListener((observable) -> totalPriceOfReservation());
+        choiceBoxRoomId.valueProperty().addListener((observable) -> totalPriceOfReservation());
+    }
 
-        int roomIndex = 0;
-        for (Room room : roomList) {
-            if (room.getNumber().equals(selectedReservation.getRoomId())) {
-                roomIndex = i;
-            }
-            i++;
-        }
-
-
-        choiceBoxSetData(guestList, roomList);
-        modifyReservationSetData(guestIndex, roomIndex);
+    public void switchMainWindow() {
+        AuxiliaryController.switchMainWindow();
     }
 
     public void modifyReservation() throws ParseException {
-
         try {
             validator.validateUpdate(new HashMap<>() {{
                 put("setStartDate", getReservationStartDate().getValue().toString());
@@ -115,16 +110,20 @@ public class ModifyReservationController implements Initializable, InitializeCon
                     Alert.AlertType.ERROR);
             return;
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        DateFormat originalFormat = new SimpleDateFormat("dd.MM.yyyy");
-        DateFormat targetFormat = new SimpleDateFormat("yyyy-MM-dd");
-
         selectedReservation.setId(reservationId.getText());
         Room room = (Room) choiceBoxRoomId.getSelectionModel().getSelectedItem();
         selectedReservation.setRoomId(room.getNumber());
         Guest guest = (Guest) choiceBoxGuestId.getSelectionModel().getSelectedItem();
         selectedReservation.setGuestId(guest.getPesel());
+        checkIfOtherPrice();
+        selectedReservation.setTotalPrice(reservationTotalPrice.getText());
+        //selectedReservation.setPayed(stateStringToBoolean((String) reservationIdPayed.getSelectionModel().getSelectedItem()));
+        selectedReservation.setPayed(false);
+
+        //data
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateFormat originalFormat = new SimpleDateFormat("dd.MM.yyyy");
+        DateFormat targetFormat = new SimpleDateFormat("yyyy-MM-dd");
         if (reservationStartDate.getValue() == null) {
             Date date = originalFormat.parse(reservationStartDate.getEditor().getText());
             String formattedDate = targetFormat.format(date);
@@ -140,16 +139,46 @@ public class ModifyReservationController implements Initializable, InitializeCon
         } else {
             selectedReservation.setEndDate(LocalDate.parse(formatter.format(reservationEndDate.getValue())));
         }
-        selectedReservation.setTotalPrice(reservationTotalPrice.getText());
-        selectedReservation.setPayed(stateStringToBoolean((String) reservationIdPayed.getSelectionModel().getSelectedItem()));
 
         reservationService.update(selectedReservation);
         switchMainWindow();
     }
 
+    private void checkIfOtherPrice() {
+        double totalPrice = Double.parseDouble(reservationTotalPrice.getText().split(" ")[0]);
+        if (previousPrice > 0 && selectedReservation.isPayed() && reservationTotalPrice.getText().length() > 0) {
+            double difference = previousPrice - totalPrice;
+            double differenceABS = Math.abs(Math.round(difference * 100.0) / 100.0);
+            if (difference > 0) {
+                generateAlert("", "Należy oddać klientowi " + differenceABS + ".", Alert.AlertType.INFORMATION);
+            } else if (difference < 0) {
+                generateAlert("", "Klient musi dopłacić " + differenceABS + ".", Alert.AlertType.INFORMATION);
+            }
+        }
+    }
 
-    private void modifyReservationSetData(int guestIndex, int roomIndex) {
+    private int getChoiceBoxGuestIndex(ObservableList<Guest> guestList) {
+        for (int i = 0; i < guestList.size(); i++) {
+            if (guestList.get(i).getPesel().equals(selectedReservation.getGuestId())) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
+    private int getChoiceBoxRoomIndex(ObservableList<Room> roomList) {
+        for (int i = 0; i < roomList.size(); i++) {
+            if (roomList.get(i).getNumber().equals(selectedReservation.getRoomId())) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private void modifyReservationSetData(ObservableList<Guest> guestList, ObservableList<Room> roomList) {
+        int guestIndex = getChoiceBoxGuestIndex(guestList);
+        int roomIndex = getChoiceBoxRoomIndex(roomList);
+        choiceBoxSetData(guestList, roomList);
         reservationId.setText(selectedReservation.getId());
         choiceBoxGuestId.getSelectionModel().select(guestIndex);
         choiceBoxRoomId.getSelectionModel().select(roomIndex);
@@ -157,7 +186,6 @@ public class ModifyReservationController implements Initializable, InitializeCon
         reservationEndDate.setValue(selectedReservation.getEndDate());
         reservationTotalPrice.setText(String.valueOf(selectedReservation.getTotalPrice()));
         reservationIdPayed.setItems(FXCollections.observableArrayList("opłacona", "nieopłacona"));
-        System.out.println(stateBooleanToString(selectedReservation.isPayed()));
         reservationIdPayed.getSelectionModel().select(stateBooleanToString(selectedReservation.isPayed()));
     }
 
@@ -167,36 +195,26 @@ public class ModifyReservationController implements Initializable, InitializeCon
     }
 
     private void totalPriceOfReservation() {
-        //dziura między wyborem daty a wpisaniem jej do edytora
+        // sprawdzenie czy wszystkie pola wymagane do obliczenia ceny sa wypelnione
         if (reservationStartDate.getValue() != null && reservationEndDate.getValue() != null
                 && choiceBoxRoomId.getSelectionModel().getSelectedIndex() > -1
                 && choiceBoxGuestId.getSelectionModel().getSelectedIndex() > -1) {
-            Room room = (Room) getChoiceBoxRoomId().getSelectionModel().getSelectedItem();
-            LocalDate startDate = LocalDate.parse(reservationStartDate.getValue().toString());
-            LocalDate endDate = LocalDate.parse(getReservationEndDate().getValue().toString());
-
-            Long daysBetween = DAYS.between(startDate, endDate);
-            Float roomPrice = room.getPrice();
-            double totalPrice = daysBetween * roomPrice;
-            double discount = totalPrice * 0.01 * ((Guest) getChoiceBoxGuestId().getSelectionModel().getSelectedItem()).getDiscount();
-            totalPrice -= discount;
-            if (!Objects.isNull(selectedReservation)) {
-                float prevPrice = Float.parseFloat(selectedReservation.getTotalPrice().split(" ")[0]);
-                if (prevPrice > 0 && selectedReservation.isPayed() && reservationTotalPrice.getText().length() > 0) {
-                    System.out.println(reservationTotalPrice.getText());
-                    double difference = prevPrice - totalPrice;
-                    difference = Math.abs(Math.round(difference * 100.0) / 100.0);
-                    if (difference > 0) {
-                        generateAlert("", "Należy oddać klientowi " + difference + ".", Alert.AlertType.INFORMATION);
-                    } else if (difference < 0) {
-                        generateAlert("", "Klient musi dopłacić " + difference + ".", Alert.AlertType.INFORMATION);
-                    }
-                }
-            }
+            double totalPrice = countTotalPricePLN();
             reservationTotalPrice.setText(totalPrice + " PLN");
         }
+    }
 
+    private double countTotalPricePLN() {
+        Room room = (Room) getChoiceBoxRoomId().getSelectionModel().getSelectedItem();
+        LocalDate startDate = LocalDate.parse(reservationStartDate.getValue().toString());
+        LocalDate endDate = LocalDate.parse(getReservationEndDate().getValue().toString());
 
+        Long daysBetween = DAYS.between(startDate, endDate);
+        Float roomPrice = room.getPrice();
+        double totalPrice = daysBetween * roomPrice;
+        double discount = totalPrice * 0.01 * ((Guest) getChoiceBoxGuestId().getSelectionModel().getSelectedItem()).getDiscount();
+        totalPrice -= discount;
+        return totalPrice;
     }
 
     private boolean stateStringToBoolean(String state) {
@@ -212,16 +230,4 @@ public class ModifyReservationController implements Initializable, InitializeCon
     }
 
 
-    public void switchMainWindow() {
-        AuxiliaryController.switchMainWindow();
-    }
-
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        reservationStartDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
-        reservationEndDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
-        choiceBoxGuestId.valueProperty().addListener((observable) -> totalPriceOfReservation());
-        choiceBoxRoomId.valueProperty().addListener((observable) -> totalPriceOfReservation());
-    }
 }
