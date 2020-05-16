@@ -168,7 +168,9 @@ public class ModifyReservationController implements Initializable, InitializeCon
 
     private void totalPriceOfReservation() {
         //dziura między wyborem daty a wpisaniem jej do edytora
-        if (reservationStartDate.getEditor().getText().length() > 0 || reservationEndDate.getEditor().getText().length() > 0) {
+        if (reservationStartDate.getValue() != null && reservationEndDate.getValue() != null
+                && choiceBoxRoomId.getSelectionModel().getSelectedIndex() > -1
+                && choiceBoxGuestId.getSelectionModel().getSelectedIndex() > -1) {
             Room room = (Room) getChoiceBoxRoomId().getSelectionModel().getSelectedItem();
             LocalDate startDate = LocalDate.parse(reservationStartDate.getValue().toString());
             LocalDate endDate = LocalDate.parse(getReservationEndDate().getValue().toString());
@@ -176,7 +178,8 @@ public class ModifyReservationController implements Initializable, InitializeCon
             Long daysBetween = DAYS.between(startDate, endDate);
             Float roomPrice = room.getPrice();
             double totalPrice = daysBetween * roomPrice;
-
+            double discount = totalPrice * 0.01 * ((Guest) getChoiceBoxGuestId().getSelectionModel().getSelectedItem()).getDiscount();
+            totalPrice -= discount;
             if (!Objects.isNull(selectedReservation)) {
                 float prevPrice = Float.parseFloat(selectedReservation.getTotalPrice().split(" ")[0]);
                 if (prevPrice > 0 && selectedReservation.isPayed() && reservationTotalPrice.getText().length() > 0) {
@@ -218,7 +221,7 @@ public class ModifyReservationController implements Initializable, InitializeCon
     public void initialize(URL url, ResourceBundle resourceBundle) {
         reservationStartDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
         reservationEndDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
-//        choiceBoxGuestId.valueProperty().addListener((observable) -> totalPriceOfReservation());
-//        choiceBoxRoomId.valueProperty().addListener((observable) -> totalPriceOfReservation());
+        choiceBoxGuestId.valueProperty().addListener((observable) -> totalPriceOfReservation());
+        choiceBoxRoomId.valueProperty().addListener((observable) -> totalPriceOfReservation());
     }
 }
