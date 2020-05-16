@@ -1,13 +1,17 @@
-package app.hotel.dbservices.implementation;
+package app.hotel.services.implementation;
 
 import app.database.entities.Guest;
+import app.database.exceptions.validations.GuestValidator;
+import app.database.exceptions.validations.Validator;
 import app.database.repositories.GuestRepository;
-import app.hotel.dbservices.GuestServiceInterface;
+import app.hotel.services.GuestServiceInterface;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class GuestService implements GuestServiceInterface {

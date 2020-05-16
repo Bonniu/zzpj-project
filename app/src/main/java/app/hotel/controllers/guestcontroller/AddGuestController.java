@@ -1,14 +1,18 @@
 package app.hotel.controllers.guestcontroller;
 
 import app.database.entities.Guest;
+import app.database.exceptions.HotelException;
+import app.database.exceptions.validations.Validator;
 import app.hotel.controllers.AuxiliaryController;
-import app.hotel.dbservices.implementation.GuestService;
+import app.hotel.services.implementation.GuestService;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+
+import java.util.HashMap;
 
 import static app.hotel.controllers.AuxiliaryController.generateAlert;
 
@@ -31,26 +35,33 @@ public class AddGuestController {
     @FXML
     public TextField guestDiscount;
 
-    //DB
-    @Autowired
-    private GuestService guestService;
+    private final GuestService guestService;
+    private final Validator<HashMap<String, String>> validator;
+
+    public AddGuestController(GuestService guestService,
+                              @Qualifier("guest") Validator<HashMap<String, String>> validator) {
+        this.guestService = guestService;
+        this.validator = validator;
+    }
 
     public void addGuest() {
-        Guest guest = new Guest();
-        if (getGuestPesel().getText().length() != 11) {
-            generateAlert("Gość nie został dodany do bazy danych.",
-                    "PESEL nie ma 11 znaków.",
-                    Alert.AlertType.ERROR);
-            return;
-        }
         try {
-            Long.parseLong(getGuestPesel().getText());
-        } catch (NumberFormatException e) {
-            generateAlert("Gość nie został dodany do bazy danych.",
-                    "PESEL jest nieprawidłowy.",
+            validator.validateInsert(new HashMap<>() {{
+                put("pesel", getGuestPesel().getText());
+                put("name", getGuestName().getText());
+                put("surname", getGuestSurname().getText());
+                put("phoneNumber", getGuestPhonenumber().getText());
+                put("discount", getGuestDiscount().getText());
+            }});
+        }
+        catch (HotelException hotelException){
+            generateAlert("Gość nie został dodany!",
+                    hotelException.getErrors().toString(),
                     Alert.AlertType.ERROR);
             return;
         }
+
+        Guest guest = new Guest();
         guest.setPesel(getGuestPesel().getText());
         guest.setName(getGuestName().getText());
         guest.setSurname(getGuestSurname().getText());
@@ -58,7 +69,6 @@ public class AddGuestController {
         guest.setDiscount(Integer.parseInt(getGuestDiscount().getText()));
 
         guestService.insert(guest);
-
         switchMainWindow();
     }
 

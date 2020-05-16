@@ -1,15 +1,10 @@
 package app.hotel.controllers.reservationcontrollers;
 
 import app.database.api.CurrencyService;
-import app.database.entities.Guest;
 import app.database.entities.Reservation;
-import app.database.entities.Room;
 import app.hotel.controllers.AuxiliaryController;
 import app.hotel.controllers.InitializeController;
-import app.hotel.dbservices.implementation.GuestService;
-import app.hotel.dbservices.implementation.ReservationService;
-import app.hotel.dbservices.implementation.RoomService;
-import app.hotel.reportmakers.ReservationReport;
+import app.hotel.services.implementation.ReservationService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -20,13 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import java.net.URL;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 import static app.hotel.controllers.AuxiliaryController.generateAlert;
-import static java.time.temporal.ChronoUnit.DAYS;
 
 
 @SuppressWarnings(value = "unchecked")

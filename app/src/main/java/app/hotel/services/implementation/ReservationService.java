@@ -1,8 +1,8 @@
-package app.hotel.dbservices.implementation;
+package app.hotel.services.implementation;
 
 import app.database.entities.Reservation;
 import app.database.repositories.ReservationRepository;
-import app.hotel.dbservices.ReservationServiceInterface;
+import app.hotel.services.ReservationServiceInterface;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
