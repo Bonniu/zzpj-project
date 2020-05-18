@@ -161,12 +161,22 @@ public class ReservationReport {
 
     private String generateReservationEntry(Reservation reservation) {
         Guest guest = new Guest();
-        if (guests.find(reservation.getGuestId()).isPresent())
-            guest = guests.find(reservation.getGuestId()).get();
+// czemu nie dziala ?????????????????????
+//        if (guests.find(reservation.getGuestId()).isPresent()) {
+//            guest = guests.find(reservation.getGuestId()).get();
+//        }
+        for (Guest tmpGuest : guests.findAll()) {
+            if (tmpGuest.getPesel().equals(reservation.getGuestId()))
+                guest = tmpGuest;
+        }
         Room room = new Room();
-        if (rooms.find(reservation.getRoomId()).isPresent())
-            room = rooms.find(reservation.getRoomId()).get();
-
+//        to samo - nie dziala ??????????????????
+//        if (rooms.find(reservation.getRoomId()).isPresent())
+//            room = rooms.find(reservation.getRoomId()).get();
+        for (Room tmpRoom : rooms.findAll()) {
+            if (tmpRoom.getNumber().equals(reservation.getRoomId()))
+                room = tmpRoom;
+        }
         return reservation.getId() +
                 " (" +
                 reservation.getStartDate() +
