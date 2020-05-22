@@ -33,17 +33,17 @@ public class GuestService implements GuestServiceInterface {
     }
 
     @Override
-    public void insert(@RequestBody Guest entity) {
+    public void insert( Guest entity) {
         this.guestRepository.insert(entity);
     }
 
     @Override
-    public void update(@RequestBody Guest entity) {
+    public void update( Guest entity) {
         this.guestRepository.save(entity);
     }
 
     @Override
-    public void delete(@RequestBody Guest entity) {
+    public void delete( Guest entity) {
         this.guestRepository.delete(entity);
     }
 }
