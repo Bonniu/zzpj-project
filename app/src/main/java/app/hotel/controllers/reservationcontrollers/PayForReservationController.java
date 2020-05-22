@@ -110,12 +110,12 @@ public class PayForReservationController implements Initializable, InitializeCon
             firstTime = false;
         } else {
             if (currencyService.getCurrencyRestModel() != null) {
-                float hajs = Float.parseFloat(reservationTotalPrice.getText().split(" ")[0]);
+                float money = Float.parseFloat(reservationTotalPrice.getText().split(" ")[0]);
                 String convertedVal = String.valueOf(
                         currencyService
                                 .getStrategyContext()
                                 .findStrategy(possibleCurrency.getValue())
-                                .rateMoney(hajs, currencyService.getCurrencyRestModel().getRates()));
+                                .rateMoney(money, currencyService.getCurrencyRestModel().getRates()));
 
                 currencyValue.setText(convertedVal);
             }
