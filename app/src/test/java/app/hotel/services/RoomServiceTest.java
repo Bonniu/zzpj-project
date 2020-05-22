@@ -1,8 +1,14 @@
 package app.hotel.services;
 
+
+
 import app.database.entities.Guest;
+import app.database.entities.Room;
 import app.database.repositories.GuestRepository;
+import app.database.repositories.RoomRepository;
+import app.hotel.App;
 import app.hotel.services.implementation.GuestService;
+import app.hotel.services.implementation.RoomService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,48 +30,48 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 @EnableAutoConfiguration
 @ActiveProfiles("test")
-public class GuestServiceTest {
+public class RoomServiceTest {
 
     @Autowired
-    private GuestService guestService;
+    private RoomService roomService;
 
     @MockBean
-    private GuestRepository repository;
+    private RoomRepository repository;
 
     @Test
     public void getGuestTest() {
         when(repository.findAll()).thenReturn(Stream
-                .of(new Guest("123455678912","Test","Test",123456789, 2))
+                .of(new Room("1",3,30.2F,"dostępny"))
                 .collect(Collectors.toList()));
-        assertEquals(1, guestService.findAll().size());
+        assertEquals(1, roomService.findAll().size());
     }
 
     @Test
     public void getGuestByIDTest(){
-        when(repository.findById("123455678912"))
-                .thenReturn(Optional.of(new Guest("123455678912", "Test", "Test", 123456789, 2)));
+        when(repository.findById("1"))
+                .thenReturn(Optional.of(new Room("1",3,30.2F,"dostępny")));
 
-        assertNotNull(guestService.find("123455678912"));
+        assertNotNull(roomService.find("1"));
     }
 
     @Test
     public void saveGuestTest() {
-        Guest guest = new Guest("123455678912", "Test", "Test", 123456789, 2);
-        when(repository.save(guest)).thenReturn(guest);
-        assertEquals(guest, guestService.insert(guest));
+        Room room = new Room("1",3,30.2F,"dostępny");
+        when(repository.save(room)).thenReturn(room);
+        assertEquals(room, roomService.insert(room));
     }
 
     @Test
     public void deleteGuestTest() {
-        Guest guest = new Guest("123455678912", "Test", "Test", 123456789, 2);
-        guestService.delete(guest);
-        verify(repository, times(1)).delete(guest);
+        Room room = new Room("1",3,30.2F,"dostępny");
+        roomService.delete(room);
+        verify(repository, times(1)).delete(room);
     }
 
     @Test
     public void modifyGuestTest() {
-        Guest guest = new Guest("123455678912", "Test", "Test2", 123456789, 2);
-        guestService.update(guest);
-        verify(repository, times(1)).save(guest);
+        Room room = new Room("1",3,30.2F,"dostępny");
+        roomService.update(room);
+        verify(repository, times(1)).save(room);
     }
 }

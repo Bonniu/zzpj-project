@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {App.class})
+@SpringBootTest
 @EnableAutoConfiguration
 @ActiveProfiles("test")
 public class DBConnectionTest{
