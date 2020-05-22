@@ -30,8 +30,9 @@ public class RoomService implements RoomServiceInterface {
     }
 
     @Override
-    public void insert(@RequestBody Room entity) {
+    public Room insert(@RequestBody Room entity) {
         this.roomRepository.insert(entity);
+        return entity;
     }
 
     @Override

@@ -1,17 +1,13 @@
 package app.hotel.services.implementation;
 
 import app.database.entities.Guest;
-import app.database.exceptions.validations.GuestValidator;
-import app.database.exceptions.validations.Validator;
 import app.database.repositories.GuestRepository;
 import app.hotel.services.GuestServiceInterface;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class GuestService implements GuestServiceInterface {
@@ -33,8 +29,9 @@ public class GuestService implements GuestServiceInterface {
     }
 
     @Override
-    public void insert(@RequestBody Guest entity) {
+    public Guest insert(@RequestBody Guest entity) {
         this.guestRepository.insert(entity);
+        return entity;
     }
 
     @Override
