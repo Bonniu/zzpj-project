@@ -10,7 +10,6 @@ spring:
       database: HotelRafonix
       port: 27017
       host: localhost
-  banner:
-    location: "banner.txt"
+
 
       # Admin123
