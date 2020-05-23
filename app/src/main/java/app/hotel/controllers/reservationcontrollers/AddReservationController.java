@@ -8,13 +8,11 @@ import app.database.exceptions.validations.Validator;
 import app.hotel.controllers.AuxiliaryController;
 import app.hotel.controllers.InitializeController;
 import app.hotel.services.implementation.ReservationService;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,6 +22,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static app.hotel.controllers.AuxiliaryController.generateAlert;
@@ -50,6 +49,7 @@ public class AddReservationController implements Initializable, InitializeContro
     @FXML
     private TextField reservationTotalPrice;
 
+    private ObservableList allRooms;
     private final ReservationService reservationService;
     private final Validator<HashMap<String, String>> validator;
 
@@ -63,15 +63,15 @@ public class AddReservationController implements Initializable, InitializeContro
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        reservationStartDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
-        reservationEndDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
+        reservationStartDate.valueProperty().addListener((observable) -> checkRooms());
+        reservationEndDate.valueProperty().addListener((observable) -> checkRooms());
         choiceBoxGuestId.valueProperty().addListener((observable) -> totalPriceOfReservation());
         choiceBoxRoomId.valueProperty().addListener((observable) -> totalPriceOfReservation());
     }
 
     private void totalPriceOfReservation() {
 
-        //dziura między wyborem daty a wpisaniem jej do edytora
+        //dziura miÄ™dzy wyborem daty a wpisaniem jej do edytora
         if (reservationStartDate.getValue() != null && reservationEndDate.getValue() != null
                 && choiceBoxRoomId.getSelectionModel().getSelectedIndex() > -1
                 && choiceBoxGuestId.getSelectionModel().getSelectedIndex() > -1) {
@@ -90,6 +90,40 @@ public class AddReservationController implements Initializable, InitializeContro
         }
     }
 
+    private void checkRooms() {
+        if (reservationStartDate.getValue() != null && reservationEndDate.getValue() != null) {
+            List<Reservation> reservations = reservationService.findAll();
+            ArrayList<Room> filteredRooms = filterOccupiedRooms(reservations);
+            choiceBoxRoomId.setItems(FXCollections.observableArrayList(filteredRooms));
+        }
+
+    }
+
+    private ArrayList<Room> filterOccupiedRooms(List<Reservation> reservations) {
+        ArrayList list = new ArrayList<>(allRooms);
+        for (int i = 0; i < allRooms.size(); i++) {
+            Room room = (Room) allRooms.get(i);
+            for (int j = 0; j < reservations.size(); j++) {
+                if (reservations.get(j).getRoomId().equals(room.getNumber())) {
+                    LocalDate rStartDate = reservations.get(j).getStartDate();
+                    LocalDate rEndDate = reservations.get(j).getEndDate();
+                    if ((!rStartDate.isBefore(reservationEndDate.getValue())
+                            && !rEndDate.isBefore(reservationEndDate.getValue()))
+                            || (!rStartDate.isAfter(reservationStartDate.getValue())
+                            && !rEndDate.isAfter(reservationStartDate.getValue()))) {
+                        System.out.println("GIT");
+                    } else {
+                        System.out.println("KOLIDUJE");
+                        System.out.println(reservations.get(j));
+                        list.remove(room);
+                    }
+                }
+            }
+        }
+        return list;
+    }
+
+
     public void addReservation() {
 
         try {
@@ -98,7 +132,7 @@ public class AddReservationController implements Initializable, InitializeContro
                 put("setEndDate", getReservationEndDate().getValue().toString());
             }});
         } catch (HotelException hotelException) {
-            generateAlert("Rezerwacja nie została dodana!",
+            generateAlert("Rezerwacja nie zostaĹ‚a dodana!",
                     hotelException.displayErrors(),
                     Alert.AlertType.ERROR);
             return;
@@ -128,12 +162,41 @@ public class AddReservationController implements Initializable, InitializeContro
         ArrayList<Object> objectList = (ArrayList<Object>) object;
         ObservableList<Guest> guestList = (ObservableList<Guest>) objectList.get(0);
         ObservableList<Room> roomList = ((ObservableList<Room>) objectList.get(1))
-                .filtered(x -> !x.getState().equals("niedostępny")); //filtrowanie niedostępnych pokojów
+                .filtered(x -> !x.getState().equals("niedostÄ™pny")); //filtrowanie niedostÄ™pnych pokojĂłw
         choiceBoxSetData(guestList, roomList);
+
+        // uniemoĹĽliwienie rezerwacji przed dniem dzisiejszym
+        reservationStartDate.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+                LocalDate today = LocalDate.now();
+                if (empty || item.compareTo(today) < 0) {
+                    setDisable(true);
+                    setStyle("-fx-background-color: #ff9ebe;");
+                }
+
+            }
+        });
+        // uniemoĹĽliwienie rezerwacji przed dniem startu rezerwacji
+        reservationEndDate.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+                if (reservationStartDate.getValue() != null)
+                    if (item.isBefore(reservationStartDate.getValue().plusDays(1))) {
+                        setDisable(true);
+                        setStyle("-fx-background-color: #ff9ebe;");
+
+                    }
+            }
+        });
+
     }
 
     private void choiceBoxSetData(ObservableList<Guest> guestList, ObservableList<Room> roomList) {
         choiceBoxGuestId.setItems(guestList);
         choiceBoxRoomId.setItems(roomList);
+        allRooms = roomList;
     }
 }
