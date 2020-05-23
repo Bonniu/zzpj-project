@@ -56,7 +56,7 @@
                             <children>
                                 <TableView fx:id="guestsTable" layoutX="15.0" layoutY="15.0" prefHeight="660.0" prefWidth="700.0">
                                     <columns>
-                                        <TableColumn fx:id="guestId" prefWidth="141.0" resizable="false" text="PESEL" />
+                                        <TableColumn fx:id="guestIDcard" prefWidth="141.0" resizable="false" text="nr dokumentu" />
                                         <TableColumn fx:id="guestName" prefWidth="189.0" resizable="false" text="Imię" />
                                         <TableColumn fx:id="guestSurname" prefWidth="150.0" resizable="false" text="Nazwisko" />
                                         <TableColumn fx:id="guestPhonenumber" prefWidth="120.0" resizable="false" text="Numer telefonu" />

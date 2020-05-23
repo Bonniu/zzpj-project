@@ -114,7 +114,7 @@ public class ModifyReservationController implements Initializable, InitializeCon
         Room room = (Room) choiceBoxRoomId.getSelectionModel().getSelectedItem();
         selectedReservation.setRoomId(room.getNumber());
         Guest guest = (Guest) choiceBoxGuestId.getSelectionModel().getSelectedItem();
-        selectedReservation.setGuestId(guest.getPesel());
+        selectedReservation.setGuestId(guest.getIDcard());
         checkIfOtherPrice();
         selectedReservation.setTotalPrice(reservationTotalPrice.getText());
         //selectedReservation.setPayed(stateStringToBoolean((String) reservationIdPayed.getSelectionModel().getSelectedItem()));
@@ -172,7 +172,7 @@ public class ModifyReservationController implements Initializable, InitializeCon
 
     private int getChoiceBoxGuestIndex(ObservableList<Guest> guestList) {
         for (int i = 0; i < guestList.size(); i++) {
-            if (guestList.get(i).getPesel().equals(selectedReservation.getGuestId())) {
+            if (guestList.get(i).getIDcard().equals(selectedReservation.getGuestId())) {
                 return i;
             }
         }

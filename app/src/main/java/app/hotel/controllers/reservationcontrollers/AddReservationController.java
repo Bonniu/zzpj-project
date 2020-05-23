@@ -107,7 +107,7 @@ public class AddReservationController implements Initializable, InitializeContro
         Reservation reservation = new Reservation();
         Guest g = (Guest) getChoiceBoxGuestId().getSelectionModel().getSelectedItem();
         Room r = (Room) getChoiceBoxRoomId().getSelectionModel().getSelectedItem();
-        reservation.setGuestId(g.getPesel());
+        reservation.setGuestId(g.getIDcard());
         reservation.setRoomId(r.getNumber());
         reservation.setStartDate(LocalDate.parse(getReservationStartDate().getValue().toString()));
         reservation.setEndDate(LocalDate.parse(getReservationEndDate().getValue().toString()));

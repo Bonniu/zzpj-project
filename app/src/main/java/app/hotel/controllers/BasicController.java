@@ -83,7 +83,7 @@ public class BasicController implements Initializable {
     private TableView<Guest> guestsTable;
     @FXML
     private TableColumn<Guest, String>
-            guestId,
+            guestIDcard,
             guestName,
             guestSurname,
             guestPhonenumber,
@@ -282,8 +282,8 @@ public class BasicController implements Initializable {
         guestList.clear();
         guestList.addAll(guestService.findAll());
 
-        guestId.setCellValueFactory(guestStringCellDataFeatures ->
-                new SimpleStringProperty(guestStringCellDataFeatures.getValue().getPesel())
+        guestIDcard.setCellValueFactory(guestStringCellDataFeatures ->
+                new SimpleStringProperty(guestStringCellDataFeatures.getValue().getIDcard())
         );
 
         guestName.setCellValueFactory(guestStringCellDataFeatures ->
