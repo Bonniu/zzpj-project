@@ -51,6 +51,9 @@ public class AddReservationController implements Initializable, InitializeContro
     private final ReservationService reservationService;
     private final Validator<HashMap<String, String>> validator;
 
+    public void switchMainWindow() {
+        AuxiliaryController.switchMainWindow();
+    }
 
     @Autowired
     public AddReservationController(ReservationService reservationService,
@@ -75,7 +78,7 @@ public class AddReservationController implements Initializable, InitializeContro
         ObservableList<Room> roomList = ((ObservableList<Room>) objectList.get(1))
                 .filtered(x -> !x.getState().equals("niedostępny")); //filtrowanie niedostÄ™pnych pokojĂłw
         choiceBoxSetData(guestList, roomList);
-        disablePastDaysOnStart();
+        setInitReservationDatePickersFactories();
     }
 
     public void addReservation() {
@@ -136,11 +139,14 @@ public class AddReservationController implements Initializable, InitializeContro
             for (Reservation r : list) {
                 LocalDate start = r.getStartDate().plusDays(1);
                 LocalDate end = r.getEndDate().minusDays(1);
+                if (start.isAfter(end))
+                    start = start.minusDays(1);
                 while (!start.isAfter(end)) {
                     dateList.add(start);
                     start = start.plusDays(1);
                 }
             }
+
             refreshDayCellFactories(dateList);
         } catch (NullPointerException ignored) {
 
@@ -154,7 +160,6 @@ public class AddReservationController implements Initializable, InitializeContro
                 super.updateItem(item, empty);
                 // koliduje dzien
                 if (empty || dateList.contains(item)) {
-                    setDisable(true);
                     setStyle("-fx-background-color: #ff9ebe;");
                 }
                 // przeszle dni
@@ -163,6 +168,10 @@ public class AddReservationController implements Initializable, InitializeContro
                     setDisable(true);
                     setStyle("-fx-background-color: #ff9ebe;");
                 }
+                // zaznaczone
+                if (reservationSelectedDays(item, empty).contains(item))
+                    setStyle("-fx-background-color: #8efffd;");
+
             }
         });
 
@@ -171,41 +180,49 @@ public class AddReservationController implements Initializable, InitializeContro
             public void updateItem(LocalDate item, boolean empty) {
                 super.updateItem(item, empty);
                 // koliduje dzien
-                if (empty || dateList.contains(item)) {
-                    setDisable(true);
+                if (empty || dateList.contains(item))
                     setStyle("-fx-background-color: #ff9ebe;");
-                }
+
                 // dni przed start date
                 if (reservationStartDate.getValue() != null) {
                     if (item.isBefore(reservationStartDate.getValue().plusDays(1))) {
                         setDisable(true);
                         setStyle("-fx-background-color: #ff9ebe;");
                     }
-                    if (item.isEqual(reservationStartDate.getValue()))
-                        setStyle("-fx-background-color: #f4ff69;");
                 }
+                // zaznaczone
+                if (reservationSelectedDays(item, empty).contains(item))
+                    setStyle("-fx-background-color: #8efffd;");
             }
         });
+    }
+
+    private ArrayList<LocalDate> reservationSelectedDays(LocalDate item, boolean empty) {
+        ArrayList<LocalDate> al = new ArrayList<>();
+        LocalDate start = reservationStartDate.getValue();
+        LocalDate end = reservationEndDate.getValue();
+        if (start == null || end == null) return new ArrayList<>(Collections.singleton(LocalDate.now()));
+        while (!start.isAfter(end)) {
+            if (empty || start.isEqual(item))
+                al.add(item);
+            start = start.plusDays(1);
+        }
+        return al;
     }
 
     private void checkRooms() {
         if (reservationStartDate.getValue() != null && reservationEndDate.getValue() != null) {
             List<Reservation> reservations = reservationService.findAll();
-            ArrayList<Room> filteredRooms = filterOccupiedRooms(reservations);
-            choiceBoxRoomId.setItems(FXCollections.observableArrayList(filteredRooms));
-        }
-
-    }
-
-    private ArrayList<Room> filterOccupiedRooms(List<Reservation> reservations) {
-        ArrayList list = new ArrayList<>(allRooms);
-        for (Object room : allRooms) {
-            for (int j = 0; j < reservations.size(); j++) {
-                if (ifConflict(reservations, j, (Room) room))
-                    list.remove(room);
+            ArrayList list = new ArrayList<>(allRooms);
+            for (Object room : allRooms) {
+                for (int j = 0; j < reservations.size(); j++) {
+                    if (ifConflict(reservations, j, (Room) room))
+                        list.remove(room);
+                }
             }
+            choiceBoxRoomId.setItems(FXCollections.observableArrayList(list));
         }
-        return list;
+
     }
 
     private boolean ifConflict(List<Reservation> reservations, int j, Room room) {
@@ -220,10 +237,6 @@ public class AddReservationController implements Initializable, InitializeContro
         return false;
     }
 
-    public void switchMainWindow() {
-        AuxiliaryController.switchMainWindow();
-    }
-
 
     private void choiceBoxSetData(ObservableList<Guest> guestList, ObservableList<Room> roomList) {
         choiceBoxGuestId.setItems(guestList);
@@ -231,12 +244,13 @@ public class AddReservationController implements Initializable, InitializeContro
         allRooms = roomList;
     }
 
-    private void disablePastDaysOnStart() {
+    private void setInitReservationDatePickersFactories() {
         // uniemożliwienie rezerwacji przed dniem dzisiejszym
         reservationStartDate.setDayCellFactory(picker -> new DateCell() {
             @Override
             public void updateItem(LocalDate item, boolean empty) {
                 super.updateItem(item, empty);
+                // przeszłe dni
                 LocalDate today = LocalDate.now();
                 if (empty || item.compareTo(today) < 0) {
                     setDisable(true);

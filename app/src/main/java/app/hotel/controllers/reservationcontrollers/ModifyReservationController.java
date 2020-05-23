@@ -13,10 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static app.hotel.controllers.AuxiliaryController.generateAlert;
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -84,14 +82,70 @@ public class ModifyReservationController implements Initializable, InitializeCon
         modifyReservationSetData(guestList, roomList);
         this.previousPrice = countTotalPricePLN();
         reservationTotalPrice.setText(previousPrice + " PLN");
+        setInitReservationDatePickersFactories();
+
     }
+
+    private ArrayList<LocalDate> reservationSelectedDays(LocalDate item, boolean empty) {
+        ArrayList<LocalDate> al = new ArrayList<>();
+        LocalDate start = reservationStartDate.getValue();
+        LocalDate end = reservationEndDate.getValue();
+        while (!start.isAfter(end)) {
+            if (empty || start.isEqual(item))
+                al.add(item);
+            start = start.plusDays(1);
+        }
+        return al;
+    }
+
+    private ArrayList<LocalDate> occupiedDays(LocalDate item, boolean empty) {
+        return null;
+    }
+
+    private void setInitReservationDatePickersFactories() {
+        reservationStartDate.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+                // przeszłe dni
+                LocalDate today = LocalDate.now();
+                if (empty || item.compareTo(today) < 0) {
+                    setDisable(true);
+                    setStyle("-fx-background-color: #ff9ebe;");
+                }
+                // zaznaczone
+                if (reservationSelectedDays(item, empty).contains(item))
+                    setStyle("-fx-background-color: #8efffd;");
+            }
+        });
+
+        reservationEndDate.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+                // przeszłe dni
+                LocalDate today = LocalDate.now();
+                if (empty || item.compareTo(today) < 0) {
+                    setDisable(true);
+                    setStyle("-fx-background-color: #ff9ebe;");
+                }
+                // zajete
+                if (occupiedDays(item, empty).contains(item))
+                    setStyle("-fx-background-color: #8efffd;");
+                // zaznaczone
+                if (reservationSelectedDays(item, empty).contains(item))
+                    setStyle("-fx-background-color: #8efffd;");
+            }
+        });
+    }
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         reservationStartDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
         reservationEndDate.valueProperty().addListener((observable) -> totalPriceOfReservation());
         choiceBoxGuestId.valueProperty().addListener((observable) -> totalPriceOfReservation());
-        choiceBoxRoomId.valueProperty().addListener((observable) -> totalPriceOfReservation());
+        choiceBoxRoomId.valueProperty().addListener((observable) -> refreshDatesAfterRoomPick());
     }
 
     public void switchMainWindow() {
@@ -156,6 +210,72 @@ public class ModifyReservationController implements Initializable, InitializeCon
                 generateAlert("", "Klient musi dopłacić " + differenceABS + ".", Alert.AlertType.INFORMATION);
             }
         }
+    }
+
+    public void refreshDatesAfterRoomPick() {
+        try {
+            Room room = (Room) choiceBoxRoomId.getSelectionModel().getSelectedItem();
+            ArrayList<Reservation> list = (ArrayList<Reservation>) reservationService.findAll();
+            System.out.println(reservationStartDate);
+            System.out.println(reservationEndDate);
+            list = (ArrayList<Reservation>) list.stream()
+                    .filter(x -> x.getRoomId().equals(room.getNumber()))
+                    .filter(x -> !x.getStartDate().equals(reservationStartDate.getValue()))
+                    .filter(x -> !x.getStartDate().equals(reservationEndDate.getValue())).collect(Collectors.toList());
+            System.out.println(list);
+            Set<LocalDate> dateList = new HashSet<>();
+            for (Reservation r : list) {
+                LocalDate start = r.getStartDate().plusDays(1);
+                LocalDate end = r.getEndDate().minusDays(1);
+                while (!start.isAfter(end)) {
+                    dateList.add(start);
+                    start = start.plusDays(1);
+                }
+            }
+            refreshDayCellFactories(dateList);
+        } catch (NullPointerException ignored) {
+
+        }
+    }
+
+    private void refreshDayCellFactories(Set<LocalDate> dateList) {
+        reservationStartDate.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+                // koliduje dzien
+                if (empty || dateList.contains(item)) {
+                    setStyle("-fx-background-color: #ff9ebe;");
+                }
+                // przeszle dni
+                LocalDate today = LocalDate.now();
+                if (empty || item.compareTo(today) < 0) {
+                    setDisable(true);
+                    setStyle("-fx-background-color: #ff9ebe;");
+                }
+            }
+        });
+
+        reservationEndDate.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+                // koliduje dzien
+                if (empty || dateList.contains(item)) {
+                    //setDisable(true);
+                    setStyle("-fx-background-color: #ff9ebe;");
+                }
+                // dni przed start date
+                if (reservationStartDate.getValue() != null) {
+                    if (item.isBefore(reservationStartDate.getValue().plusDays(1))) {
+                        setDisable(true);
+                        setStyle("-fx-background-color: #ff9ebe;");
+                    }
+                    if (item.isEqual(reservationStartDate.getValue()))
+                        setStyle("-fx-background-color: #f4ff69;");
+                }
+            }
+        });
     }
 
     private void subtractDiscountFromGuest() {
