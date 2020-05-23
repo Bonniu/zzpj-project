@@ -85,8 +85,6 @@ public class ModifyReservationController implements Initializable, InitializeCon
         reservationTotalPrice.setText(previousPrice + " PLN");
         setInitReservationDatePickersFactories();
         allRooms = roomList;
-        System.out.println(" roomList " + roomList);
-        System.out.println(" allRooms " + allRooms);
     }
 
     private ArrayList<LocalDate> reservationSelectedDays(LocalDate item, boolean empty) {
@@ -107,7 +105,11 @@ public class ModifyReservationController implements Initializable, InitializeCon
         try {
             Room room = (Room) choiceBoxRoomId.getSelectionModel().getSelectedItem();
             ArrayList<Reservation> list = (ArrayList<Reservation>) reservationService.findAll();
-            list = (ArrayList<Reservation>) list.stream().filter(x -> x.getRoomId().equals(room.getNumber())).collect(Collectors.toList());
+            // wszystkie rezerwacje bez obecnej
+            list = (ArrayList<Reservation>) list.stream()
+                    .filter(x -> x.getRoomId().equals(room.getNumber())) // rezerwacje tego samego pokoju
+                    .filter(x -> !x.getId().equals(reservationId.getText())) // odrzucenie obecnej
+                    .collect(Collectors.toList());
             Set<LocalDate> dateList = new HashSet<>();
             for (Reservation r : list) {
                 LocalDate start = r.getStartDate().plusDays(1);
@@ -172,8 +174,8 @@ public class ModifyReservationController implements Initializable, InitializeCon
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        reservationStartDate.valueProperty().addListener((observable) -> checkRooms());
-        reservationEndDate.valueProperty().addListener((observable) -> checkRooms());
+        reservationStartDate.valueProperty().addListener((observable) -> refreshRoomsAfterDatePick());
+        reservationEndDate.valueProperty().addListener((observable) -> refreshRoomsAfterDatePick());
         choiceBoxGuestId.valueProperty().addListener((observable) -> totalPriceOfReservation());
         choiceBoxRoomId.valueProperty().addListener((observable) -> refreshDatesAfterRoomPick());
     }
@@ -242,28 +244,37 @@ public class ModifyReservationController implements Initializable, InitializeCon
         }
     }
 
-    private void checkRooms() {
-        try {
-            if (reservationStartDate.getValue() != null && reservationEndDate.getValue() != null) {
+    private void refreshRoomsAfterDatePick() {
+        // jak obydwie daty są wybrane to go
+        if (reservationStartDate.getValue() != null && reservationEndDate.getValue() != null) {
+            try {
+                // wybranie listy dostępnych pokoi do rezerwacji w wybranym przedziale
                 List<Reservation> reservations = reservationService.findAll();
                 ArrayList list = new ArrayList<>(allRooms);
                 for (Object room : allRooms) {
                     for (int j = 0; j < reservations.size(); j++) {
-                        if (ifConflict(reservations, j, (Room) room))
+                        if (ifConflict(reservations.get(j), (Room) room))
                             list.remove(room);
                     }
                 }
+                // ustawienie listy pokoi dostępnych do rezerwacji
                 choiceBoxRoomId.setItems(FXCollections.observableArrayList(list));
+                // ponowne obliczenie ceny
                 totalPriceOfReservation();
+
+            } catch (NullPointerException ignored) {
             }
-        } catch (NullPointerException ignored) {
         }
     }
 
-    private boolean ifConflict(List<Reservation> reservations, int j, Room room) {
-        if (reservations.get(j).getRoomId().equals(room.getNumber())) {
-            LocalDate rStartDate = reservations.get(j).getStartDate();
-            LocalDate rEndDate = reservations.get(j).getEndDate();
+    private boolean ifConflict(Reservation reservation, Room room) {
+
+        if (reservation.getId().equals(reservationId.getText()))
+            return false;
+
+        if (reservation.getRoomId().equals(room.getNumber())) {
+            LocalDate rStartDate = reservation.getStartDate();
+            LocalDate rEndDate = reservation.getEndDate();
             return !((!rStartDate.isBefore(reservationEndDate.getValue())
                     && !rEndDate.isBefore(reservationEndDate.getValue()))
                     || (!rStartDate.isAfter(reservationStartDate.getValue())
@@ -277,36 +288,36 @@ public class ModifyReservationController implements Initializable, InitializeCon
         try {
             Room room = (Room) choiceBoxRoomId.getSelectionModel().getSelectedItem();
             ArrayList<Reservation> list = (ArrayList<Reservation>) reservationService.findAll();
-            System.out.println(reservationStartDate);
-            System.out.println(reservationEndDate);
+            // wszystkie rezerwacje bez obecnej
             list = (ArrayList<Reservation>) list.stream()
-                    .filter(x -> x.getRoomId().equals(room.getNumber()))
-                    .filter(x -> !x.getStartDate().equals(reservationStartDate.getValue()))
-                    .filter(x -> !x.getStartDate().equals(reservationEndDate.getValue())).collect(Collectors.toList());
-            System.out.println(list);
-            Set<LocalDate> dateList = new HashSet<>();
+                    .filter(x -> x.getRoomId().equals(room.getNumber())) // rezerwacje tego samego pokoju
+                    .filter(x -> !x.getId().equals(reservationId.getText())) // odrzucenie obecnej
+                    .collect(Collectors.toList());
+            //przekształcenie listy rezerwacji na liste dni, w których dany pokój jest zajęty
+            Set<LocalDate> redDateList = new HashSet<>();
             for (Reservation r : list) {
                 LocalDate start = r.getStartDate().plusDays(1);
                 LocalDate end = r.getEndDate().minusDays(1);
                 while (!start.isAfter(end)) {
-                    dateList.add(start);
+                    redDateList.add(start);
                     start = start.plusDays(1);
                 }
             }
-            refreshDayCellFactories(dateList);
+
+            // zaznaczenie dni i odświeżenie ceny
+            refreshDayCellFactories(redDateList);
             totalPriceOfReservation();
         } catch (NullPointerException ignored) {
-
         }
     }
 
-    private void refreshDayCellFactories(Set<LocalDate> dateList) {
+    private void refreshDayCellFactories(Set<LocalDate> redDateList) {
         reservationStartDate.setDayCellFactory(picker -> new DateCell() {
             @Override
             public void updateItem(LocalDate item, boolean empty) {
                 super.updateItem(item, empty);
                 // koliduje dzien
-                if (empty || dateList.contains(item)) {
+                if (empty || redDateList.contains(item)) {
                     setStyle("-fx-background-color: #ff9ebe;");
                 }
                 // przeszle dni
@@ -323,7 +334,7 @@ public class ModifyReservationController implements Initializable, InitializeCon
             public void updateItem(LocalDate item, boolean empty) {
                 super.updateItem(item, empty);
                 // koliduje dzien
-                if (empty || dateList.contains(item)) {
+                if (empty || redDateList.contains(item)) {
                     //setDisable(true);
                     setStyle("-fx-background-color: #ff9ebe;");
                 }
@@ -388,11 +399,11 @@ public class ModifyReservationController implements Initializable, InitializeCon
     }
 
     private void totalPriceOfReservation() {
-        System.out.println("total price");
         // sprawdzenie czy wszystkie pola wymagane do obliczenia ceny sa wypelnione
         if (reservationStartDate.getValue() != null && reservationEndDate.getValue() != null
                 && choiceBoxRoomId.getSelectionModel().getSelectedIndex() > -1
                 && choiceBoxGuestId.getSelectionModel().getSelectedIndex() > -1) {
+            // obliczenie ceny całkowitej w PLN
             double totalPrice = countTotalPricePLN();
             reservationTotalPrice.setText(totalPrice + " PLN");
         }
