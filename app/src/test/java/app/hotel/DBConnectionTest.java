@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,9 +23,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
 @EnableAutoConfiguration
-@ActiveProfiles("test")
+@ActiveProfiles("dupa")
+@SpringBootTest(classes = App.class) // Like this
 public class DBConnectionTest{
 
     @Autowired
@@ -38,7 +40,7 @@ public class DBConnectionTest{
     @Test
     public void connectionGuestRepository() {
         Guest guest = guestRepository
-                .save(new Guest("123455678912","Marek","Szafran",123456789, 2));
+                .save(new Guest("123455678912","Test","Test",123456789, 2));
         List<Guest> foundEntity = guestRepository.findAll();
 
         assertNotNull(foundEntity);

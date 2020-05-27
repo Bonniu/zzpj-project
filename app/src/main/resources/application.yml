@@ -10,5 +10,6 @@ spring:
       host: localhost
   banner:
     location: "banner.txt"
-
+server:
+  port: 8081
       # Admin123
