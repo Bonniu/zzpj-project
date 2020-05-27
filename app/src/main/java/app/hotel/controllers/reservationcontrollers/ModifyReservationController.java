@@ -147,6 +147,7 @@ public class ModifyReservationController implements Initializable, InitializeCon
     }
 
     public void modifyReservation() throws ParseException {
+
         try {
             validator.validateUpdate(new HashMap<>() {{
                 put("setStartDate", getReservationStartDate().getValue().toString());
@@ -165,7 +166,6 @@ public class ModifyReservationController implements Initializable, InitializeCon
         selectedReservation.setGuestId(guest.getIDcard());
         checkIfOtherPrice();
         selectedReservation.setTotalPrice(reservationTotalPrice.getText());
-        //selectedReservation.setPayed(stateStringToBoolean((String) reservationIdPayed.getSelectionModel().getSelectedItem()));
         selectedReservation.setPayed(false);
 
         //data
@@ -188,6 +188,15 @@ public class ModifyReservationController implements Initializable, InitializeCon
             selectedReservation.setEndDate(LocalDate.parse(formatter.format(reservationEndDate.getValue())));
         }
 
+        List<Reservation> reservations = reservationService.findAll();
+        for (Reservation reservation : reservations) {
+            if (ifConflict(reservation, (Room) room)) {
+                generateAlert("", "Wybrany termin jest już zarezerwowany.", Alert.AlertType.ERROR);
+                return;
+            }
+        }
+
+        
         reservationService.update(selectedReservation);
         switchMainWindow();
     }
@@ -352,10 +361,6 @@ public class ModifyReservationController implements Initializable, InitializeCon
     }
 
     private double countTotalPricePLN() {
-
-//        System.out.println(choiceBoxRoomId.getItems().size());
-//        System.out.println(choiceBoxRoomId.getItems());
-//        choiceBoxRoomId.getSelectionModel().select(roomIndex);
         Room room = (Room) choiceBoxRoomId.getSelectionModel().getSelectedItem();
         LocalDate startDate = LocalDate.parse(reservationStartDate.getValue().toString());
         LocalDate endDate = LocalDate.parse(getReservationEndDate().getValue().toString());
