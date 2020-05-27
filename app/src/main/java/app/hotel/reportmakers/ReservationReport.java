@@ -161,7 +161,7 @@ public class ReservationReport {
     private String generateReservationEntry(Reservation reservation) {
         Guest guest = new Guest();
         for (Guest tmpGuest : guests.findAll()) {
-            if (tmpGuest.getPesel().equals(reservation.getGuestId()))
+            if (tmpGuest.getIDcard().equals(reservation.getGuestId()))
                 guest = tmpGuest;
         }
         Room room = new Room();

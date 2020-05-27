@@ -22,7 +22,7 @@ import static app.hotel.controllers.AuxiliaryController.generateAlert;
 public class ModifyGuestController implements InitializeController {
 
     @FXML
-    public TextField guestPesel;
+    public TextField guestIDCard;
 
     @FXML
     private TextField guestName;
