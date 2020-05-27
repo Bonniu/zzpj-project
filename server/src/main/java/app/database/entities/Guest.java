@@ -16,7 +16,7 @@ public class Guest {
     private String IDcard;
     private String name;
     private String surname;
-    private int phoneNumber;
+    private long phoneNumber;
     private int discount;
 
 

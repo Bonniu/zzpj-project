@@ -64,7 +64,7 @@ public class AddGuestController {
         guest.setIDcard(getGuestIDcard().getText());
         guest.setName(getGuestName().getText());
         guest.setSurname(getGuestSurname().getText());
-        guest.setPhoneNumber(Integer.parseInt(getGuestPhonenumber().getText()));
+        guest.setPhoneNumber(Long.parseLong(getGuestPhonenumber().getText()));
         guest.setDiscount(Integer.parseInt(getGuestDiscount().getText()));
 
         guestService.insert(guest);

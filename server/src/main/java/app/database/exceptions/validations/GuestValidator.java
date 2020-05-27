@@ -12,18 +12,8 @@ public class GuestValidator implements Validator<HashMap<String, String>> {
 
     @Override
     public void validateInsert(HashMap<String, String> param) throws HotelException {
-//
-//        if (param.get("IDcard").length() != 11)
-//            hotelExceptionBuilder.addError(GuestErrorMessages.WRONG_PESEL);
-//
-//        try {
-//            Long.parseLong(param.get("IDcard"));
-//        } catch (NumberFormatException nfe) {
-//            hotelExceptionBuilder.addError(GuestErrorMessages.WRONG_PESEL_DIGIT);
-//        }
 
         validateUpdate(param);
-
     }
 
     @Override
