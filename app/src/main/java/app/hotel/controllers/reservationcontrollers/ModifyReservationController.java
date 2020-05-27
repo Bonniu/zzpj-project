@@ -80,10 +80,11 @@ public class ModifyReservationController implements Initializable, InitializeCon
         ObservableList<Guest> guestList = (ObservableList<Guest>) objectList.get(1);
         ObservableList<Room> roomList = (ObservableList<Room>) objectList.get(2);
         guestService = (GuestService) objectList.get(3);
+
         modifyReservationSetData(guestList, roomList);
         this.previousPrice = countTotalPricePLN();
         reservationTotalPrice.setText(previousPrice + " PLN");
-        setInitReservationDatePickersFactories();
+        setDayCellFactories();
         allRooms = roomList;
     }
 
@@ -104,80 +105,41 @@ public class ModifyReservationController implements Initializable, InitializeCon
             return null;
         try {
             Room room = (Room) choiceBoxRoomId.getSelectionModel().getSelectedItem();
+
             ArrayList<Reservation> list = (ArrayList<Reservation>) reservationService.findAll();
-            // wszystkie rezerwacje bez obecnej
             list = (ArrayList<Reservation>) list.stream()
                     .filter(x -> x.getRoomId().equals(room.getNumber())) // rezerwacje tego samego pokoju
                     .filter(x -> !x.getId().equals(reservationId.getText())) // odrzucenie obecnej
                     .collect(Collectors.toList());
-            Set<LocalDate> dateList = new HashSet<>();
-            for (Reservation r : list) {
-                LocalDate start = r.getStartDate().plusDays(1);
-                LocalDate end = r.getEndDate().minusDays(1);
-                if (start.isAfter(end))
-                    start = start.minusDays(1);
-                while (!start.isAfter(end)) {
-                    dateList.add(start);
-                    start = start.plusDays(1);
-                }
-            }
 
-            return dateList;
+            return generateOccupiedDays(list);
         } catch (NullPointerException ignored) {
 
         }
         return null;
     }
 
-    private void setInitReservationDatePickersFactories() {
-        reservationStartDate.setDayCellFactory(picker -> new DateCell() {
-            @Override
-            public void updateItem(LocalDate item, boolean empty) {
-                super.updateItem(item, empty);
-                // przeszłe dni
-                LocalDate today = LocalDate.now();
-                if (empty || item.compareTo(today) < 0) {
-                    setDisable(true);
-                    setStyle("-fx-background-color: #ff9ebe;");
-                }
-                // zajete
-                if (occupiedDays() != null)
-                    if (occupiedDays().contains(item))
-                        setStyle("-fx-background-color: #ff9ebe;");
-                // zaznaczone
-                if (reservationSelectedDays(item, empty).contains(item))
-                    setStyle("-fx-background-color: #8efffd;");
+    private Set<LocalDate> generateOccupiedDays(ArrayList<Reservation> list) {
+        Set<LocalDate> dateList = new HashSet<>();
+        for (Reservation r : list) {
+            LocalDate start = r.getStartDate().plusDays(1);
+            LocalDate end = r.getEndDate().minusDays(1);
+            if (start.isAfter(end))
+                start = start.minusDays(1);
+            while (!start.isAfter(end)) {
+                dateList.add(start);
+                start = start.plusDays(1);
             }
-        });
-
-        reservationEndDate.setDayCellFactory(picker -> new DateCell() {
-            @Override
-            public void updateItem(LocalDate item, boolean empty) {
-                super.updateItem(item, empty);
-                // przeszłe dni
-                LocalDate today = LocalDate.now();
-                if (empty || item.compareTo(today) < 0) {
-                    setDisable(true);
-                    setStyle("-fx-background-color: #ff9ebe;");
-                }
-                // zajete
-                if (occupiedDays() != null)
-                    if (occupiedDays().contains(item))
-                        setStyle("-fx-background-color: #ff9ebe;");
-                // zaznaczone
-                if (reservationSelectedDays(item, empty).contains(item))
-                    setStyle("-fx-background-color: #8efffd;");
-            }
-        });
+        }
+        return dateList;
     }
-
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         reservationStartDate.valueProperty().addListener((observable) -> refreshRoomsAfterDatePick());
         reservationEndDate.valueProperty().addListener((observable) -> refreshRoomsAfterDatePick());
         choiceBoxGuestId.valueProperty().addListener((observable) -> totalPriceOfReservation());
-        choiceBoxRoomId.valueProperty().addListener((observable) -> refreshDatesAfterRoomPick());
+        choiceBoxRoomId.valueProperty().addListener((observable) -> totalPriceOfReservation());
     }
 
     public void switchMainWindow() {
@@ -252,8 +214,8 @@ public class ModifyReservationController implements Initializable, InitializeCon
                 List<Reservation> reservations = reservationService.findAll();
                 ArrayList list = new ArrayList<>(allRooms);
                 for (Object room : allRooms) {
-                    for (int j = 0; j < reservations.size(); j++) {
-                        if (ifConflict(reservations.get(j), (Room) room))
+                    for (Reservation reservation : reservations) {
+                        if (ifConflict(reservation, (Room) room))
                             list.remove(room);
                     }
                 }
@@ -283,49 +245,25 @@ public class ModifyReservationController implements Initializable, InitializeCon
         return false;
     }
 
-
-    public void refreshDatesAfterRoomPick() {
-        try {
-            Room room = (Room) choiceBoxRoomId.getSelectionModel().getSelectedItem();
-            ArrayList<Reservation> list = (ArrayList<Reservation>) reservationService.findAll();
-            // wszystkie rezerwacje bez obecnej
-            list = (ArrayList<Reservation>) list.stream()
-                    .filter(x -> x.getRoomId().equals(room.getNumber())) // rezerwacje tego samego pokoju
-                    .filter(x -> !x.getId().equals(reservationId.getText())) // odrzucenie obecnej
-                    .collect(Collectors.toList());
-            //przekształcenie listy rezerwacji na liste dni, w których dany pokój jest zajęty
-            Set<LocalDate> redDateList = new HashSet<>();
-            for (Reservation r : list) {
-                LocalDate start = r.getStartDate().plusDays(1);
-                LocalDate end = r.getEndDate().minusDays(1);
-                while (!start.isAfter(end)) {
-                    redDateList.add(start);
-                    start = start.plusDays(1);
-                }
-            }
-
-            // zaznaczenie dni i odświeżenie ceny
-            refreshDayCellFactories(redDateList);
-            totalPriceOfReservation();
-        } catch (NullPointerException ignored) {
-        }
-    }
-
-    private void refreshDayCellFactories(Set<LocalDate> redDateList) {
+    private void setDayCellFactories() {
         reservationStartDate.setDayCellFactory(picker -> new DateCell() {
             @Override
             public void updateItem(LocalDate item, boolean empty) {
                 super.updateItem(item, empty);
-                // koliduje dzien
-                if (empty || redDateList.contains(item)) {
-                    setStyle("-fx-background-color: #ff9ebe;");
-                }
                 // przeszle dni
                 LocalDate today = LocalDate.now();
                 if (empty || item.compareTo(today) < 0) {
                     setDisable(true);
                     setStyle("-fx-background-color: #ff9ebe;");
                 }
+                // zaznaczone
+                if (reservationSelectedDays(item, empty).contains(item))
+                    setStyle("-fx-background-color: #8efffd;");
+                // koliduje dzien
+                Set<LocalDate> occupiedDays = occupiedDays();
+                if (occupiedDays != null)
+                    if (occupiedDays.contains(item))
+                        setStyle("-fx-background-color: #ff9ebe;");
             }
         });
 
@@ -333,11 +271,6 @@ public class ModifyReservationController implements Initializable, InitializeCon
             @Override
             public void updateItem(LocalDate item, boolean empty) {
                 super.updateItem(item, empty);
-                // koliduje dzien
-                if (empty || redDateList.contains(item)) {
-                    //setDisable(true);
-                    setStyle("-fx-background-color: #ff9ebe;");
-                }
                 // dni przed start date
                 if (reservationStartDate.getValue() != null) {
                     if (item.isBefore(reservationStartDate.getValue().plusDays(1))) {
@@ -345,6 +278,14 @@ public class ModifyReservationController implements Initializable, InitializeCon
                         setStyle("-fx-background-color: #ff9ebe;");
                     }
                 }
+                // zaznaczone
+                if (reservationSelectedDays(item, empty).contains(item))
+                    setStyle("-fx-background-color: #8efffd;");
+                // koliduje dzien
+                Set<LocalDate> occupiedDays = occupiedDays();
+                if (occupiedDays != null)
+                    if (occupiedDays.contains(item))
+                        setStyle("-fx-background-color: #ff9ebe;");
             }
         });
     }
@@ -380,17 +321,18 @@ public class ModifyReservationController implements Initializable, InitializeCon
     }
 
     private void modifyReservationSetData(ObservableList<Guest> guestList, ObservableList<Room> roomList) {
-        int guestIndex = getChoiceBoxGuestIndex(guestList);
-        int roomIndex = getChoiceBoxRoomIndex(roomList);
-        choiceBoxSetData(guestList, roomList);
         reservationId.setText(selectedReservation.getId());
-        choiceBoxGuestId.getSelectionModel().select(guestIndex);
-        choiceBoxRoomId.getSelectionModel().select(roomIndex);
         reservationStartDate.setValue(selectedReservation.getStartDate());
         reservationEndDate.setValue(selectedReservation.getEndDate());
         reservationTotalPrice.setText(String.valueOf(selectedReservation.getTotalPrice()));
         reservationIdPayed.setItems(FXCollections.observableArrayList("opłacona", "nieopłacona"));
         reservationIdPayed.getSelectionModel().select(stateBooleanToString(selectedReservation.isPayed()));
+
+        int guestIndex = getChoiceBoxGuestIndex(guestList);
+        int roomIndex = getChoiceBoxRoomIndex(roomList);
+        choiceBoxSetData(guestList, roomList);
+        choiceBoxGuestId.getSelectionModel().select(guestIndex);
+        choiceBoxRoomId.getSelectionModel().select(roomIndex);
     }
 
     private void choiceBoxSetData(ObservableList<Guest> guestList, ObservableList<Room> roomList) {
@@ -410,7 +352,11 @@ public class ModifyReservationController implements Initializable, InitializeCon
     }
 
     private double countTotalPricePLN() {
-        Room room = (Room) getChoiceBoxRoomId().getSelectionModel().getSelectedItem();
+
+//        System.out.println(choiceBoxRoomId.getItems().size());
+//        System.out.println(choiceBoxRoomId.getItems());
+//        choiceBoxRoomId.getSelectionModel().select(roomIndex);
+        Room room = (Room) choiceBoxRoomId.getSelectionModel().getSelectedItem();
         LocalDate startDate = LocalDate.parse(reservationStartDate.getValue().toString());
         LocalDate endDate = LocalDate.parse(getReservationEndDate().getValue().toString());
 

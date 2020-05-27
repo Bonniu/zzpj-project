@@ -134,7 +134,6 @@ public class AddReservationController implements Initializable, InitializeContro
             Room room = (Room) choiceBoxRoomId.getSelectionModel().getSelectedItem();
             ArrayList<Reservation> list = (ArrayList<Reservation>) reservationService.findAll();
             list = (ArrayList<Reservation>) list.stream().filter(x -> x.getRoomId().equals(room.getNumber())).collect(Collectors.toList());
-            System.out.println(list);
             Set<LocalDate> dateList = new HashSet<>();
             for (Reservation r : list) {
                 LocalDate start = r.getStartDate().plusDays(1);
@@ -146,7 +145,6 @@ public class AddReservationController implements Initializable, InitializeContro
                     start = start.plusDays(1);
                 }
             }
-
             refreshDayCellFactories(dateList);
         } catch (NullPointerException ignored) {
 
@@ -201,7 +199,8 @@ public class AddReservationController implements Initializable, InitializeContro
         ArrayList<LocalDate> al = new ArrayList<>();
         LocalDate start = reservationStartDate.getValue();
         LocalDate end = reservationEndDate.getValue();
-        if (start == null || end == null) return new ArrayList<>(Collections.singleton(LocalDate.now()));
+        if (start == null || end == null)
+            return new ArrayList<>(Collections.singleton(LocalDate.of(3010, 10, 10)));
         while (!start.isAfter(end)) {
             if (empty || start.isEqual(item))
                 al.add(item);
