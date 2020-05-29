@@ -1,12 +1,9 @@
 spring:
-  javafx:
-    title: "Hotel application"
-    admin:
-      password: "{bcrypt}$2a$10$P9VzJNkcQUXIZ8bgNA293eY8avEy9MLWCxUGALuyyqWxF17US9RfG"
   data:
     mongodb:
-      database: testDB
-      port: 27017
+      database: dbtest
       host: localhost
+      port: 27028
+
 server:
-  port: 9093
+  port: 8085

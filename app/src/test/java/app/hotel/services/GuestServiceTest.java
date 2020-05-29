@@ -2,6 +2,7 @@ package app.hotel.services;
 
 import app.database.entities.Guest;
 import app.database.repositories.GuestRepository;
+import app.hotel.App;
 import app.hotel.services.implementation.GuestService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,8 +23,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@EnableAutoConfiguration
-@ActiveProfiles("test")
+@ActiveProfiles(profiles = "test")
 public class GuestServiceTest {
 
     @Autowired

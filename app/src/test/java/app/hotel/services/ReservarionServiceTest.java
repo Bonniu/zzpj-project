@@ -26,8 +26,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@EnableAutoConfiguration
-@ActiveProfiles("test")
+@ActiveProfiles(profiles = "test")
 public class ReservarionServiceTest {
 
     @Autowired
