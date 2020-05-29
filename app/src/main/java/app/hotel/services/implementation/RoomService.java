@@ -32,6 +32,7 @@ public class RoomService implements RoomServiceInterface {
     @Override
     public void insert( Room entity) {
         this.roomRepository.insert(entity);
+        return entity;
     }
 
     @Override

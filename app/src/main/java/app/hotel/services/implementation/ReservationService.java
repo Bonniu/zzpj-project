@@ -34,6 +34,7 @@ public class ReservationService implements ReservationServiceInterface {
     @Override
     public void insert( Reservation entity) {
         this.reservationRepository.insert(entity);
+        return entity;
     }
 
     @Override

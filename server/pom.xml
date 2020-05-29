@@ -36,8 +36,14 @@
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-test</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <type>jar</type>
     </dependency>
 
     <dependency>
@@ -45,11 +51,6 @@
       <artifactId>spring-data-mongodb</artifactId>
       <version>2.2.5.RELEASE</version>
     </dependency>
-    <!--    Z tym dependency maven nie widzi testow-->
-<!--        <dependency>-->
-<!--          <groupId>org.springframework.boot</groupId>-->
-<!--          <artifactId>spring-boot-starter-test</artifactId>-->
-<!--        </dependency>-->
 
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -69,7 +70,6 @@
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
 </project>
