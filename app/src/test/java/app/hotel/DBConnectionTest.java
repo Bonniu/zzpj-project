@@ -62,7 +62,7 @@ public class DBConnectionTest{
     public void connectionReservationRepository() {
         Reservation reservation = reservationRepository
                 .save(new Reservation("12","12345678910","2",
-                        LocalDate.parse("2020-05-01"),LocalDate.parse("2020-05-10"),"1000.00 PLN",false));
+                        LocalDate.parse("2020-05-01"),LocalDate.parse("2020-05-11"),"1000.00 PLN",false));
         List<Reservation> foundEntity = reservationRepository.findAll();
 
         assertNotNull(foundEntity);
