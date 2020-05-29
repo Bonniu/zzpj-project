@@ -1,6 +1,6 @@
 package app.hotel.controllers.reservationcontrollers;
 
-import app.database.api.CurrencyService;
+import app.hotel.services.implementation.CurrencyService;
 import app.database.entities.Guest;
 import app.database.entities.Reservation;
 import app.hotel.controllers.AuxiliaryController;
@@ -109,16 +109,16 @@ public class PayForReservationController implements Initializable, InitializeCon
         if (firstTime) {
             firstTime = false;
         } else {
-            if (currencyService.getCurrencyRestModel() != null) {
-                float hajs = Float.parseFloat(reservationTotalPrice.getText().split(" ")[0]);
-                String convertedVal = String.valueOf(
-                        currencyService
-                                .getStrategyContext()
-                                .findStrategy(possibleCurrency.getValue())
-                                .rateMoney(hajs, currencyService.getCurrencyRestModel().getRates()));
 
-                currencyValue.setText(convertedVal);
-            }
+            float money = Float.parseFloat(reservationTotalPrice.getText().split(" ")[0]);
+            String convertedVal = String.valueOf(
+                    currencyService
+                            .getStrategyContext()
+                            .findStrategy(possibleCurrency.getValue())
+                            .rateMoney(money, currencyService.getRateModel()));
+
+            currencyValue.setText(convertedVal);
+
         }
     }
 

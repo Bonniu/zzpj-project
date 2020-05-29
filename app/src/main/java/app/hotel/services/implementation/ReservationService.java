@@ -32,18 +32,18 @@ public class ReservationService implements ReservationServiceInterface {
     }
 
     @Override
-    public Reservation insert(@RequestBody Reservation entity) {
+    public void insert( Reservation entity) {
         this.reservationRepository.insert(entity);
         return entity;
     }
 
     @Override
-    public void update(@RequestBody Reservation entity) {
+    public void update( Reservation entity) {
         this.reservationRepository.save(entity);
     }
 
     @Override
-    public void delete(@RequestBody Reservation entity) {
+    public void delete( Reservation entity) {
         this.reservationRepository.delete(entity);
     }
 

@@ -21,7 +21,7 @@ import static app.hotel.controllers.AuxiliaryController.generateAlert;
 public class AddGuestController {
 
     @FXML
-    public TextField guestPesel;
+    public TextField guestIDcard;
 
     @FXML
     private TextField guestName;
@@ -47,14 +47,13 @@ public class AddGuestController {
     public void addGuest() {
         try {
             validator.validateInsert(new HashMap<>() {{
-                put("pesel", getGuestPesel().getText());
+                put("guestIDcard", getGuestIDcard().getText());
                 put("name", getGuestName().getText());
                 put("surname", getGuestSurname().getText());
                 put("phoneNumber", getGuestPhonenumber().getText());
                 put("discount", getGuestDiscount().getText());
             }});
-        }
-        catch (HotelException hotelException){
+        } catch (HotelException hotelException) {
             generateAlert("Gość nie został dodany!",
                     hotelException.displayErrors(),
                     Alert.AlertType.ERROR);
@@ -62,10 +61,10 @@ public class AddGuestController {
         }
 
         Guest guest = new Guest();
-        guest.setPesel(getGuestPesel().getText());
+        guest.setIDcard(getGuestIDcard().getText());
         guest.setName(getGuestName().getText());
         guest.setSurname(getGuestSurname().getText());
-        guest.setPhoneNumber(Integer.parseInt(getGuestPhonenumber().getText()));
+        guest.setPhoneNumber(Long.parseLong(getGuestPhonenumber().getText()));
         guest.setDiscount(Integer.parseInt(getGuestDiscount().getText()));
 
         guestService.insert(guest);

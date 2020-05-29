@@ -15,10 +15,10 @@ import java.util.Objects;
 public class Guest {
 
     @Id
-    private String pesel;
+    private String IDcard;
     private String name;
     private String surname;
-    private int phoneNumber;
+    private long phoneNumber;
     private int discount;
 
 
