@@ -29,8 +29,7 @@ public class GuestService implements GuestServiceInterface {
     }
 
     @Override
-
-    public void insert( Guest entity) {
+    public Guest insert( Guest entity) {
         this.guestRepository.insert(entity);
         return entity;
     }

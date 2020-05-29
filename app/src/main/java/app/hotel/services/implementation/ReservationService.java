@@ -32,7 +32,7 @@ public class ReservationService implements ReservationServiceInterface {
     }
 
     @Override
-    public void insert( Reservation entity) {
+    public Reservation insert( Reservation entity) {
         this.reservationRepository.insert(entity);
         return entity;
     }

@@ -44,7 +44,7 @@ public class DBConnectionTest{
 
         assertNotNull(foundEntity);
         int last = foundEntity.size();
-        assertEquals(guest.getPesel(), foundEntity.get(last-1).getPesel());
+        assertEquals(guest.getIDcard(), foundEntity.get(last-1).getIDcard());
     }
 
     @Test
